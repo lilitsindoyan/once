@@ -100,6 +100,9 @@ export async function getTransferByToken(token: string) {
     state: "pending" as const,
     serial: transfer.bottle.serial,
     series: transfer.bottle.series.name,
+    batch: transfer.bottle.series.batchNumber,
+    productionDate: transfer.bottle.series.productionDate,
+    sentAt: transfer.createdAt,
     sender: await senderLabel(db, transfer.bottleId, transfer.senderId),
     invitedEmail: transfer.recipientEmail,
     invitedEmailMasked: maskEmail(transfer.recipientEmail),
@@ -143,4 +146,40 @@ export async function acceptTransfer(user: User, token: string, showName: boolea
     vars: { serial: result.bottle.serial },
   });
   return { serial: result.bottle.serial };
+}
+
+/** Transfers page (design frame 212): transfers the user sent, received, or is invited to accept. */
+export async function listMyTransfers(user: User) {
+  const transfers = await db.transfer.findMany({
+    where: {
+      OR: [{ senderId: user.id }, { recipientId: user.id }, { recipientEmail: user.email, status: "PENDING" }],
+    },
+    include: { bottle: { include: { series: true } }, sender: true },
+    orderBy: { createdAt: "desc" },
+    take: 50,
+  });
+  const rows = await Promise.all(
+    transfers.map(async (t) => {
+      const outgoing = t.senderId === user.id;
+      return {
+        id: t.id,
+        serial: t.bottle.serial,
+        series: t.bottle.series.name,
+        batch: t.bottle.series.batchNumber,
+        status: t.status,
+        createdAt: t.createdAt,
+        outgoing,
+        counterpart: outgoing ? t.recipientEmail : await senderLabel(db, t.bottleId, t.senderId),
+        awaitingMe: !outgoing && t.status === "PENDING",
+      };
+    }),
+  );
+  return {
+    stats: {
+      awaitingRecipient: rows.filter((r) => r.outgoing && r.status === "PENDING").length,
+      awaitingMe: rows.filter((r) => r.awaitingMe).length,
+      completed: rows.filter((r) => r.status === "ACCEPTED").length,
+    },
+    rows,
+  };
 }

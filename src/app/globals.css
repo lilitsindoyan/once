@@ -16,6 +16,8 @@
   --color-cream: #d3c3af;
   --color-cream-2: #cec2ad;
   --color-mute: #828282;
+  --color-bronze-1: #8e6a4b;
+  --color-bronze-2: #6a4c34;
   --color-danger: #d9725f;
   --color-ok: #8fb07a;
 
@@ -34,6 +36,15 @@ body {
   color: var(--color-cream-2);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+}
+
+/* Copper fibre glow behind dashboard pages (stands in for the texture image until it is exported). */
+.once-texture {
+  background-color: #000;
+  background-image:
+    radial-gradient(ellipse 55% 45% at 100% 0%, rgba(150, 70, 25, 0.28), transparent 70%),
+    radial-gradient(ellipse 45% 40% at 0% 100%, rgba(150, 70, 25, 0.24), transparent 70%),
+    radial-gradient(ellipse 30% 25% at 85% 20%, rgba(200, 110, 50, 0.08), transparent 70%);
 }
 
 /* Admin panel: light, neutral UI kit */

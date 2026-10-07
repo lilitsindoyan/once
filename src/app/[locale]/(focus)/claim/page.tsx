@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { getCurrentUser } from "@/server/auth";
 import { getPendingClaim } from "@/server/claim";
-import { PageTitle } from "@/components/ui";
+import { SplitScreen } from "@/components/portal/split-screen";
 import { ClaimFlow } from "./claim-flow";
 
 export async function generateMetadata() {
@@ -9,15 +9,15 @@ export async function generateMetadata() {
   return { title: t("title") };
 }
 
-/** Flow 2. The general QR code on every bottle opens this page. */
+/**
+ * Flow 2. The general QR code on every bottle opens this page.
+ * Design frames 156–166, adapted to v1.2: the camera "Scan" step becomes entering serial + hidden code.
+ */
 export default async function ClaimPage() {
-  const t = await getTranslations("claim");
   const [user, pending] = await Promise.all([getCurrentUser(), getPendingClaim()]);
-
   return (
-    <div className="mx-auto max-w-lg">
-      <PageTitle eyebrow="ONCE">{t("title")}</PageTitle>
+    <SplitScreen image="closeup" back={user ? { href: "/my-bottles" } : undefined}>
       <ClaimFlow loggedIn={!!user} pending={pending} />
-    </div>
+    </SplitScreen>
   );
 }

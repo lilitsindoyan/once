@@ -8,6 +8,17 @@ import { sendEmail } from "@/lib/email";
 import { ensureCountryPin } from "./pins";
 import type { User } from "@prisma/client";
 
+export type ClaimSummary = { serial: string; series: string; batch: string; productionDate: string | null };
+
+function summary(bottle: { serial: string; series: { name: string; batchNumber: string; productionDate: Date | null } }): ClaimSummary {
+  return {
+    serial: bottle.serial,
+    series: bottle.series.name,
+    batch: bottle.series.batchNumber,
+    productionDate: bottle.series.productionDate?.toISOString() ?? null,
+  };
+}
+
 /** Points to confirm (ToR 8.8): 5 wrong attempts → 15-minute block. */
 const MAX_FAILURES = 5;
 const BLOCK_WINDOW_MS = 15 * 60 * 1000;
@@ -40,7 +51,7 @@ export async function checkClaim(rawSerial: string, rawCode: string, clientKey: 
   if (bottle.status === "DEACTIVATED") throw new AppError("claim_deactivated");
 
   await setCookie("claim", { bottleId: bottle.id });
-  return { serial: bottle.serial, series: bottle.series.name, batch: bottle.series.batchNumber };
+  return summary(bottle);
 }
 
 /** The bottle remembered by the claim check (survives the login / registration detour). */
@@ -49,7 +60,7 @@ export async function getPendingClaim() {
   if (!token) return null;
   const bottle = await db.bottle.findUnique({ where: { id: token.bottleId }, include: { series: true } });
   if (!bottle || bottle.status !== "UNCLAIMED") return null;
-  return { serial: bottle.serial, series: bottle.series.name, batch: bottle.series.batchNumber };
+  return summary(bottle);
 }
 
 /** Flow 2, steps 5–7. */

@@ -4,7 +4,6 @@ import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { fontVariables } from "../fonts";
-import { SiteHeader } from "@/components/site-header";
 import "../globals.css";
 
 export const metadata: Metadata = {
@@ -12,6 +11,7 @@ export const metadata: Metadata = {
   robots: { index: false }, // portal pages are private
 };
 
+/** Root of the portal. Each route group adds its own frame: (dashboard) sidebar, (focus) split screens, (public). */
 export default async function LocaleLayout({
   children,
   params,
@@ -26,10 +26,7 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} className={fontVariables}>
       <body className="min-h-screen">
-        <NextIntlClientProvider>
-          <SiteHeader />
-          <main className="mx-auto w-full max-w-5xl px-4 pt-8 pb-24 sm:px-8 sm:pt-12">{children}</main>
-        </NextIntlClientProvider>
+        <NextIntlClientProvider>{children}</NextIntlClientProvider>
       </body>
     </html>
   );
