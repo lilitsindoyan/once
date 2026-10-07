@@ -93,11 +93,11 @@ export function LoginFlow({
         }}
       >
         <Eyebrow>{t("eyebrow")}</Eyebrow>
-        <Display upper={false} className="mt-6">
+        <Display upper={false} className="mt-6 lg:mt-[clamp(9px,2.67vh,24px)]">
           {t("title")}
         </Display>
-        <Lead className="mt-7">{t("intro")}</Lead>
-        <div className="mt-12 grid gap-8">
+        <Lead className="mt-7 lg:mt-[clamp(11px,3.11vh,28px)]">{t("intro")}</Lead>
+        <div className="mt-12 lg:mt-[clamp(19px,5.33vh,48px)] grid gap-8 lg:gap-[clamp(12px,3.56vh,32px)]">
           {errorBox}
           <Field label={t("email")}>
             <TextInput type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} autoFocus />
@@ -107,9 +107,9 @@ export function LoginFlow({
           </PrimaryButton>
           <p className="text-center text-xs text-copper-2">{t("helper")}</p>
         </div>
-        <div className="mt-10">
+        <div className="mt-10 lg:mt-[clamp(16px,4.44vh,40px)]">
           <Divider />
-          <a href={siteUrl} className="mt-10 inline-flex items-center gap-4 text-[12px] text-copper hover:underline">
+          <a href={siteUrl} className="mt-10 lg:mt-[clamp(16px,4.44vh,40px)] inline-flex items-center gap-4 text-[12px] text-copper hover:underline">
             <ArrowLeft className="size-4" strokeWidth={1.4} />
             {tc("backToOnce")}
           </a>
@@ -127,11 +127,11 @@ export function LoginFlow({
         }}
       >
         <Eyebrow>{t("codeEyebrow")}</Eyebrow>
-        <Display upper={false} className="mt-6">
+        <Display upper={false} className="mt-6 lg:mt-[clamp(9px,2.67vh,24px)]">
           {t("codeTitle")}
         </Display>
-        <Lead className="mt-7">{t("codeSent", { email })}</Lead>
-        <div className="mt-12 grid gap-8">
+        <Lead className="mt-7 lg:mt-[clamp(11px,3.11vh,28px)]">{t("codeSent", { email })}</Lead>
+        <div className="mt-12 lg:mt-[clamp(19px,5.33vh,48px)] grid gap-8 lg:gap-[clamp(12px,3.56vh,32px)]">
           {errorBox}
           <CodeInput value={code} onChange={setCode} label={t("code")} />
           <PrimaryButton type="submit" busy={busy} disabled={code.length !== 6}>
@@ -147,12 +147,12 @@ export function LoginFlow({
             )}
           </p>
         </div>
-        <div className="mt-10">
+        <div className="mt-10 lg:mt-[clamp(16px,4.44vh,40px)]">
           <Divider />
           <button
             type="button"
             onClick={() => setStep("email")}
-            className="mt-10 inline-flex items-center gap-4 text-[12px] text-copper hover:underline"
+            className="mt-10 lg:mt-[clamp(16px,4.44vh,40px)] inline-flex items-center gap-4 text-[12px] text-copper hover:underline"
           >
             <ArrowLeft className="size-4" strokeWidth={1.4} />
             {t("changeEmail")}
@@ -170,14 +170,14 @@ export function LoginFlow({
       }}
     >
       <Eyebrow>{t("profileEyebrow")}</Eyebrow>
-      <Display upper={false} className="mt-6">
+      <Display upper={false} className="mt-6 lg:mt-[clamp(9px,2.67vh,24px)]">
         {t("profileTitle")}
       </Display>
-      <Lead className="mt-7">{t("profileIntro")}</Lead>
+      <Lead className="mt-7 lg:mt-[clamp(11px,3.11vh,28px)]">{t("profileIntro")}</Lead>
       <p className="mt-2 text-sm text-white">{email}</p>
-      <div className="mt-10 grid gap-7">
+      <div className="mt-10 lg:mt-[clamp(16px,4.44vh,40px)] grid gap-7 lg:gap-[clamp(11px,3.11vh,28px)]">
         {errorBox}
-        <div className="grid gap-7 sm:grid-cols-2 sm:gap-4">
+        <div className="grid gap-7 lg:gap-[clamp(11px,3.11vh,28px)] sm:grid-cols-2 sm:gap-4">
           <Field label={t("firstName")}>
             <TextInput
               autoComplete="given-name"

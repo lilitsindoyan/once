@@ -70,15 +70,15 @@ export function TransferFlow({ serial, initialShowName, ownEmail }: { serial: st
       <div className={wrap}>
         <Eyebrow className="leading-[1.7]">{t("privacyEyebrow")}</Eyebrow>
         <Display className="mt-4">{t("title")}</Display>
-        <Lead className="mt-6">{t("privacyIntro")}</Lead>
-        <div className="mt-8">
+        <Lead className="mt-6 lg:mt-[clamp(9px,2.67vh,24px)]">{t("privacyIntro")}</Lead>
+        <div className="mt-8 lg:mt-[clamp(12px,3.56vh,32px)]">
           <IdentityChoice
             value={showName}
             onChange={setShowName}
             labels={{ show: t("showName"), showHint: t("showNameHint"), anon: t("anonymous"), anonHint: t("anonymousHint") }}
           />
         </div>
-        <PrimaryButton className="mt-6" onClick={() => setStep("email")}>
+        <PrimaryButton className="mt-6 lg:mt-[clamp(9px,2.67vh,24px)]" onClick={() => setStep("email")}>
           {t("continue")}
         </PrimaryButton>
       </div>
@@ -95,8 +95,8 @@ export function TransferFlow({ serial, initialShowName, ownEmail }: { serial: st
       >
         <Eyebrow>{t("emailEyebrow")}</Eyebrow>
         <Display className="mt-4">{t("emailTitle")}</Display>
-        <Lead className="mt-6">{t("emailIntro")}</Lead>
-        <div className="mt-10 grid gap-7">
+        <Lead className="mt-6 lg:mt-[clamp(9px,2.67vh,24px)]">{t("emailIntro")}</Lead>
+        <div className="mt-10 lg:mt-[clamp(16px,4.44vh,40px)] grid gap-7 lg:gap-[clamp(11px,3.11vh,28px)]">
           {errorBox}
           <Field label={t("email")}>
             <TextInput type="email" required autoComplete="off" value={email} onChange={(e) => setEmail(e.target.value)} autoFocus />
@@ -124,8 +124,8 @@ export function TransferFlow({ serial, initialShowName, ownEmail }: { serial: st
       <div className={wrap}>
         <Eyebrow>{t("checkEyebrow")}</Eyebrow>
         <Display className="mt-4">{t("checkTitle")}</Display>
-        <p className="mt-8 font-display text-[26px] break-all text-white sm:text-[30px]">{norm(email)}</p>
-        <div className="mt-8 grid gap-6">
+        <p className="mt-8 lg:mt-[clamp(12px,3.56vh,32px)] font-display text-[26px] break-all text-white sm:text-[30px]">{norm(email)}</p>
+        <div className="mt-8 lg:mt-[clamp(12px,3.56vh,32px)] grid gap-6 lg:gap-[clamp(9px,2.67vh,24px)]">
           <Notice tone="info">{t("warning")}</Notice>
           {errorBox}
           <PrimaryButton onClick={confirm} busy={busy}>
@@ -142,9 +142,9 @@ export function TransferFlow({ serial, initialShowName, ownEmail }: { serial: st
   return (
     <div className={wrap}>
       <Display>{closed ? t("closedTitle") : t("sentTitle")}</Display>
-      <Lead className="mt-5">{t("sentText", { email: norm(email) })}</Lead>
+      <Lead className="mt-5 lg:mt-[clamp(8px,2.22vh,20px)]">{t("sentText", { email: norm(email) })}</Lead>
       <InfoPanel
-        className="mt-6"
+        className="mt-6 lg:mt-[clamp(9px,2.67vh,24px)]"
         rows={[
           [
             t("method"),
@@ -157,7 +157,7 @@ export function TransferFlow({ serial, initialShowName, ownEmail }: { serial: st
           [t("sentOn"), sentAt ? format.dateTime(sentAt, { dateStyle: "medium", timeStyle: "short" }) : "—"],
         ]}
       />
-      <div className="mt-10 flex items-center gap-5">
+      <div className="mt-10 lg:mt-[clamp(16px,4.44vh,40px)] flex items-center gap-5 lg:gap-[clamp(8px,2.22vh,20px)]">
         <span className="grid size-[54px] shrink-0 place-items-center rounded-full border border-copper">
           <Clock3 className="size-6 text-copper" strokeWidth={1.2} />
         </span>
@@ -166,8 +166,8 @@ export function TransferFlow({ serial, initialShowName, ownEmail }: { serial: st
           <p className="mt-1 text-[12px] text-cream-2">{t("awaitingText")}</p>
         </div>
       </div>
-      {closed && <p className="mt-8 text-[13px] leading-relaxed text-mute">{t("closedText")}</p>}
-      <PrimaryLink href={closed ? "/login" : "/my-bottles"} className="mt-10">
+      {closed && <p className="mt-8 lg:mt-[clamp(12px,3.56vh,32px)] text-[13px] leading-relaxed text-mute">{t("closedText")}</p>}
+      <PrimaryLink href={closed ? "/login" : "/my-bottles"} className="mt-10 lg:mt-[clamp(16px,4.44vh,40px)]">
         {closed ? t("home") : t("backToBottles")}
       </PrimaryLink>
     </div>

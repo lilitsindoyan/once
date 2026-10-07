@@ -23,7 +23,7 @@ export default async function AcceptPage({ params }: { params: Promise<{ token: 
       <SplitScreen image="stand">
         <div className="max-w-[440px] lg:pt-6">
           <Display>{t("title")}</Display>
-          <div className="mt-8">
+          <div className="mt-8 lg:mt-[clamp(12px,3.56vh,32px)]">
             <Notice>{transfer.state === "used" ? t("used") : t("invalid")}</Notice>
           </div>
         </div>

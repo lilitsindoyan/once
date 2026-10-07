@@ -19,7 +19,7 @@ export function Display({ children, upper = true, className }: { children: React
     <h1
       className={clsx(
         "font-display leading-[1.08] text-white",
-        upper ? "text-[34px] tracking-[0.04em] uppercase sm:text-[44px]" : "text-[40px] sm:text-[56px]",
+        upper ? "text-[34px] tracking-[0.04em] uppercase lg:text-[clamp(26px,4.6vh,44px)]" : "text-[40px] lg:text-[clamp(32px,6vh,56px)]",
         className,
       )}
     >
@@ -32,8 +32,8 @@ export function Display({ children, upper = true, className }: { children: React
 export function PageHeading({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
     <div>
-      <h1 className="font-display text-2xl tracking-[0.06em] text-white uppercase sm:text-[30px]">{title}</h1>
-      {subtitle && <p className="mt-3 text-[11px] tracking-[0.28em] text-mute uppercase">{subtitle}</p>}
+      <h1 className="font-display text-2xl tracking-[0.06em] text-white uppercase lg:text-[clamp(22px,3.4vh,30px)]">{title}</h1>
+      {subtitle && <p className="mt-[clamp(6px,1.3vh,12px)] text-[11px] tracking-[0.28em] text-mute uppercase">{subtitle}</p>}
     </div>
   );
 }
@@ -43,9 +43,9 @@ export function Lead({ children, className }: { children: ReactNode; className?:
 }
 
 const primary =
-  "group inline-flex min-h-[56px] w-full items-center justify-center gap-4 bg-gradient-to-r from-bronze-1 to-bronze-2 px-8 font-display text-[15px] tracking-[0.22em] text-white uppercase shadow-[0_10px_30px_rgba(0,0,0,0.35)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50";
+  "group inline-flex min-h-[56px] lg:min-h-[clamp(44px,6.2vh,56px)] w-full items-center justify-center gap-4 bg-gradient-to-r from-bronze-1 to-bronze-2 px-8 font-display text-[15px] tracking-[0.22em] text-white uppercase shadow-[0_10px_30px_rgba(0,0,0,0.35)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50";
 const outline =
-  "inline-flex min-h-[56px] w-full items-center justify-center gap-3 border border-copper-border px-8 font-display text-[15px] tracking-[0.22em] text-white uppercase transition hover:bg-copper/10 disabled:opacity-50";
+  "inline-flex min-h-[56px] lg:min-h-[clamp(44px,6.2vh,56px)] w-full items-center justify-center gap-3 border border-copper-border px-8 font-display text-[15px] tracking-[0.22em] text-white uppercase transition hover:bg-copper/10 disabled:opacity-50";
 const small =
   "inline-flex min-h-[44px] items-center justify-center gap-2 border border-[#4a4038] px-6 text-[13px] tracking-[0.04em] text-cream transition hover:border-copper hover:text-white";
 
@@ -111,7 +111,7 @@ export function Field({ label, error, hint, children }: { label: string; error?:
 }
 
 const inputCls =
-  "h-[56px] w-full border border-[#3b332c] bg-transparent px-5 text-[15px] text-white placeholder:tracking-[0.3em] placeholder:text-[#5d5249] focus:border-copper focus:outline-none";
+  "h-[56px] lg:h-[clamp(44px,6.2vh,56px)] w-full border border-[#3b332c] bg-transparent px-5 text-[15px] text-white placeholder:tracking-[0.3em] placeholder:text-[#5d5249] focus:border-copper focus:outline-none";
 
 export function TextInput(props: InputHTMLAttributes<HTMLInputElement>) {
   return <input {...props} className={clsx(inputCls, props.className)} />;
@@ -131,8 +131,8 @@ export function SelectInput(props: SelectHTMLAttributes<HTMLSelectElement>) {
 /** Dark panel with label / value rows (bottle details, transfer details). */
 export function InfoPanel({ rows, className, children }: { rows: [string, ReactNode][]; className?: string; children?: ReactNode }) {
   return (
-    <div className={clsx("border border-[#2b241e] bg-[#0d0b09]/90 px-6 py-5", className)}>
-      <dl className="grid gap-y-3.5">
+    <div className={clsx("border border-[#2b241e] bg-[#0d0b09]/90 px-6 py-[clamp(12px,2.2vh,20px)]", className)}>
+      <dl className="grid gap-y-[clamp(8px,1.5vh,14px)]">
         {rows.map(([label, value]) => (
           <div key={label} className="grid grid-cols-[minmax(0,150px)_1fr] items-center gap-4">
             <dt className="text-[11px] tracking-[0.1em] text-copper-2 uppercase">{label}</dt>
@@ -150,7 +150,7 @@ export function RuledRows({ rows }: { rows: [string, ReactNode][] }) {
   return (
     <dl className="max-w-[420px]">
       {rows.map(([label, value]) => (
-        <div key={label} className="grid grid-cols-[170px_1fr] items-center gap-4 border-b border-[#2a2420] py-3.5">
+        <div key={label} className="grid grid-cols-[170px_1fr] items-center gap-4 border-b border-[#2a2420] py-[clamp(5px,1.35vh,14px)]">
           <dt className="text-[12px] tracking-[0.06em] text-copper-2 uppercase">{label}</dt>
           <dd className="text-[13px] text-white">{value}</dd>
         </div>
@@ -170,7 +170,7 @@ export function IdentityChoice({
   labels: { show: string; showHint: string; anon: string; anonHint: string };
 }) {
   const option = (checked: boolean, title: string, hint: string, v: boolean, last: boolean) => (
-    <label className={clsx("flex cursor-pointer gap-5 py-5", !last && "border-b border-[#2e2722]")}>
+    <label className={clsx("flex cursor-pointer gap-5 py-[clamp(10px,2vh,20px)]", !last && "border-b border-[#2e2722]")}>
       <input type="radio" name="identity" className="peer sr-only" checked={checked} onChange={() => onChange(v)} />
       <span
         aria-hidden

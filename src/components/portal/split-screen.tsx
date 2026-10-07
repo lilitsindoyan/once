@@ -25,7 +25,7 @@ export async function SplitScreen({
   const src = image === "stand" ? "/design/bottle-stand.jpg" : "/design/bottle-closeup.jpg";
 
   return (
-    <div className="mx-auto grid max-w-[1440px] lg:min-h-[calc(100vh-110px)] lg:grid-cols-[1fr_minmax(0,560px)] lg:gap-16 lg:pr-[90px]">
+    <div className="mx-auto grid max-w-[1440px] lg:h-full lg:grid-cols-[1fr_minmax(0,560px)] lg:gap-16 lg:pr-[90px]">
       <div className="relative h-[260px] overflow-hidden sm:h-[360px] lg:h-auto">
         <Image
           src={src}
@@ -46,16 +46,18 @@ export async function SplitScreen({
           </Link>
         )}
         {caption && (
-          <div className="absolute bottom-10 left-12 hidden lg:block">
-            <p className="max-w-[160px] font-display text-[26px] leading-[1.25] tracking-[0.3em] text-cream-2 uppercase">
+          <div className="absolute bottom-[clamp(16px,5vh,40px)] left-12 hidden lg:block">
+            <p className="max-w-[160px] font-display text-[clamp(18px,3.2vh,26px)] leading-[1.25] tracking-[0.3em] text-cream-2 uppercase">
               {t("moreThanSpirit")}
             </p>
-            <span className="my-6 block h-px w-14 bg-cream-2/60" aria-hidden />
+            <span className="my-[clamp(10px,2.5vh,24px)] block h-px w-14 bg-cream-2/60" aria-hidden />
             <p className="max-w-[170px] text-[13px] leading-[1.9] tracking-[0.2em] text-cream-2 uppercase">{t("storyLivesOn")}</p>
           </div>
         )}
       </div>
-      <div className="px-4 pt-8 pb-20 sm:px-12 lg:px-0 lg:pt-6">{children}</div>
+      <div className="px-4 pt-8 pb-20 sm:px-12 lg:flex lg:h-full lg:flex-col lg:overflow-y-auto lg:px-0 lg:py-[clamp(8px,2vh,24px)]">
+        <div className="lg:my-auto">{children}</div>
+      </div>
     </div>
   );
 }

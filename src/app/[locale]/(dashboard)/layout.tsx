@@ -10,13 +10,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const locale = await getLocale();
 
   return (
-    <div className="once-texture min-h-screen lg:grid lg:grid-cols-[260px_1fr]">
-      <aside className="border-b border-[#1f1a16] lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col lg:border-r lg:border-b-0">
-        <div className="flex items-center justify-between px-4 py-5 lg:block lg:px-12 lg:pt-10 lg:pb-12">
+    <div className="once-texture min-h-screen lg:grid lg:h-dvh lg:min-h-0 lg:grid-cols-[260px_1fr] lg:overflow-hidden">
+      <aside className="border-b border-[#1f1a16] lg:flex lg:h-dvh lg:flex-col lg:border-r lg:border-b-0">
+        <div className="flex items-center justify-between px-4 py-5 lg:block lg:px-12 lg:pt-[clamp(20px,4.5vh,40px)] lg:pb-[clamp(16px,4vh,48px)]">
           <Link href="/my-bottles" aria-label="ONCE">
             <Image src="/once-logo.svg" alt="ONCE" width={150} height={32} priority className="h-6 w-auto lg:h-8" />
           </Link>
-          <p className="mt-6 hidden max-w-[180px] text-[10px] leading-[1.8] tracking-[0.3em] text-mute uppercase lg:block">
+          <p className="mt-[clamp(10px,2.5vh,24px)] hidden max-w-[180px] text-[10px] leading-[1.8] tracking-[0.3em] text-mute uppercase lg:block">
             {t("tagline")}
           </p>
           <div className="lg:hidden">
@@ -28,13 +28,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
         </div>
       </aside>
 
-      <div className="min-w-0">
-        <header className="hidden justify-end px-12 pt-8 lg:flex">
-          <div className="border-b border-[#2a241f] pb-5 pl-16">
+      <div className="flex min-w-0 flex-col lg:h-dvh">
+        <header className="hidden shrink-0 justify-end px-12 pt-[clamp(14px,3.5vh,32px)] lg:flex">
+          <div className="border-b border-[#2a241f] pb-[clamp(10px,2vh,20px)] pl-16">
             <TopBarActions locale={locale} />
           </div>
         </header>
-        <main className="px-4 pt-8 pb-20 sm:px-8 lg:px-14 lg:pt-6">
+        <main className="px-4 pt-8 pb-20 sm:px-8 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:px-14 lg:pt-[clamp(8px,2vh,24px)] lg:pb-[clamp(12px,3vh,32px)]">
           {children}
           <div className="mt-12 lg:hidden">
             <MobileLogout />

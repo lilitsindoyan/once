@@ -97,7 +97,7 @@ export function ClaimFlow({ loggedIn, pending }: { loggedIn: boolean; pending: C
   return (
     <div className="max-w-[440px] lg:pt-2">
       {step !== "done" && (
-        <div className="mb-10">
+        <div className="mb-10 lg:mb-[clamp(16px,4.44vh,40px)]">
           <Stepper steps={steps} current={stepIndex} />
         </div>
       )}
@@ -110,11 +110,11 @@ export function ClaimFlow({ loggedIn, pending }: { loggedIn: boolean; pending: C
           }}
         >
           <Eyebrow>{t("eyebrow")}</Eyebrow>
-          <Display upper={false} className="mt-5">
+          <Display upper={false} className="mt-5 lg:mt-[clamp(8px,2.22vh,20px)]">
             {t("title")}
           </Display>
-          <Lead className="mt-6">{t("intro")}</Lead>
-          <div className="mt-10 grid gap-7">
+          <Lead className="mt-6 lg:mt-[clamp(9px,2.67vh,24px)]">{t("intro")}</Lead>
+          <div className="mt-10 lg:mt-[clamp(16px,4.44vh,40px)] grid gap-7 lg:gap-[clamp(11px,3.11vh,28px)]">
             {errorBox}
             <Field label={t("serial")} hint={t("serialHint")}>
               <TextInput
@@ -153,7 +153,7 @@ export function ClaimFlow({ loggedIn, pending }: { loggedIn: boolean; pending: C
               <span className="grid size-[54px] place-items-center rounded-full border border-copper">
                 <Check className="size-6 text-copper" strokeWidth={1.4} />
               </span>
-              <Eyebrow className="mt-7">{t("steps.claim")}</Eyebrow>
+              <Eyebrow className="mt-7 lg:mt-[clamp(11px,3.11vh,28px)]">{t("steps.claim")}</Eyebrow>
               <Display className="mt-4">{bottle.serial}</Display>
             </>
           ) : (
@@ -162,13 +162,13 @@ export function ClaimFlow({ loggedIn, pending }: { loggedIn: boolean; pending: C
               <Display className="mt-4">{step === "verify" ? t("verifyTitle") : step === "claim" ? t("privacyTitle") : bottle.serial}</Display>
             </>
           )}
-          {step === "identify" && <Lead className="mt-5">{t("identifiedText")}</Lead>}
-          {step === "verify" && <Lead className="mt-5">{t("verifyText")}</Lead>}
+          {step === "identify" && <Lead className="mt-5 lg:mt-[clamp(8px,2.22vh,20px)]">{t("identifiedText")}</Lead>}
+          {step === "verify" && <Lead className="mt-5 lg:mt-[clamp(8px,2.22vh,20px)]">{t("verifyText")}</Lead>}
           {step !== "verify" && (
-            <InfoPanel className="mt-6" rows={step === "identify" || step === "done" ? details : [[t("serial"), bottle.serial], ...details.slice(0, 1)]} />
+            <InfoPanel className="mt-6 lg:mt-[clamp(9px,2.67vh,24px)]" rows={step === "identify" || step === "done" ? details : [[t("serial"), bottle.serial], ...details.slice(0, 1)]} />
           )}
 
-          <div className="mt-8 grid gap-5">
+          <div className="mt-8 lg:mt-[clamp(12px,3.56vh,32px)] grid gap-5 lg:gap-[clamp(8px,2.22vh,20px)]">
             {errorBox}
 
             {step === "identify" && (

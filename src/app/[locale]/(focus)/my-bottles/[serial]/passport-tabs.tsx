@@ -20,8 +20,8 @@ export function PassportTabs({
   ] as const;
 
   return (
-    <div className="mt-10">
-      <div role="tablist" className="flex max-w-[420px] gap-8 border-b border-[#2a2420]">
+    <div className="mt-10 lg:mt-[clamp(16px,4.44vh,40px)]">
+      <div role="tablist" className="flex max-w-[420px] gap-8 lg:gap-[clamp(12px,3.56vh,32px)] border-b border-[#2a2420]">
         {tabs.map(([key, label]) => (
           <button
             key={key}
@@ -40,7 +40,7 @@ export function PassportTabs({
           </button>
         ))}
       </div>
-      <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`} className="mt-8">
+      <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`} className="mt-8 lg:mt-[clamp(12px,3.56vh,32px)]">
         {tab === "overview" ? overview : history}
       </div>
     </div>

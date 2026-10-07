@@ -60,7 +60,7 @@ export default async function PassportPage({ params }: { params: Promise<{ seria
   );
 
   const history = (
-    <ol className="relative grid max-w-[420px] gap-7 border-l border-copper/40 pl-7">
+    <ol className="relative grid max-w-[420px] gap-7 lg:gap-[clamp(11px,3.11vh,28px)] border-l border-copper/40 pl-7">
       {passport.history.map((h, i) => (
         <li key={i} className="relative">
           <span className="absolute top-1.5 -left-[33px] size-2.5 rounded-full border border-copper bg-black" aria-hidden />

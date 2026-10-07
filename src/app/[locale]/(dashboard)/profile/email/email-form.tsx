@@ -63,12 +63,12 @@ export function ChangeEmailForm({ currentEmail }: { currentEmail: string }) {
       <BackToProfile />
       <PageHeading title={t("emailTitle")} />
       <Lead className="mt-4 max-w-[520px]">{t("emailIntro")}</Lead>
-      <div className="mt-10">
+      <div className="mt-10 lg:mt-[clamp(16px,4.44vh,40px)]">
         {done ? (
           <SuccessPanel title={t("emailUpdatedTitle")} text={t("emailUpdatedText")} />
         ) : (
           <form
-            className="grid max-w-[520px] gap-7"
+            className="grid max-w-[520px] gap-7 lg:gap-[clamp(11px,3.11vh,28px)]"
             onSubmit={(e) => {
               e.preventDefault();
               if (sent) confirm();

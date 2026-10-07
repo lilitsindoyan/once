@@ -49,6 +49,7 @@ export function AcceptFlow({
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
+  const [choosing, setChoosing] = useState(false);
 
   const next = `/accept/${token}`;
   const rows: [string, string][] = [
@@ -78,27 +79,54 @@ export function AcceptFlow({
         <span className="grid size-[54px] place-items-center rounded-full border border-copper">
           <Check className="size-6 text-copper" strokeWidth={1.4} />
         </span>
-        <Eyebrow className="mt-7">{t("doneEyebrow")}</Eyebrow>
+        <Eyebrow className="mt-7 lg:mt-[clamp(11px,3.11vh,28px)]">{t("doneEyebrow")}</Eyebrow>
         <Display className="mt-4">{t("doneTitle")}</Display>
-        <Lead className="mt-5">{t("doneText")}</Lead>
-        <InfoPanel className="mt-6" rows={[[t("bottleNumber"), bottle.serial], ...rows]} />
-        <PrimaryLink href="/my-bottles" className="mt-6">
+        <Lead className="mt-5 lg:mt-[clamp(8px,2.22vh,20px)]">{t("doneText")}</Lead>
+        <InfoPanel className="mt-6 lg:mt-[clamp(9px,2.67vh,24px)]" rows={[[t("bottleNumber"), bottle.serial], ...rows]} />
+        <PrimaryLink href="/my-bottles" className="mt-6 lg:mt-[clamp(9px,2.67vh,24px)]">
           {t("viewAll")}
         </PrimaryLink>
-        <div className="mt-5 text-center">
+        <div className="mt-5 lg:mt-[clamp(8px,2.22vh,20px)] text-center">
           <TextLink href={`/my-bottles/${bottle.serial}`}>{t("viewPassport")}</TextLink>
         </div>
       </div>
     );
 
+  // Step 2: how the recipient appears, then accept (the design's "Your ownership details" screen).
+  if (choosing)
+    return (
+      <div className="max-w-[440px] lg:pt-2">
+        <Eyebrow>{bottle.serial}</Eyebrow>
+        <Display className="mt-4">{t("privacyTitle")}</Display>
+        <p className="mt-4 text-[12px] text-mute">{t("loggedInAs", { email: loggedInEmail ?? "" })}</p>
+        <div className="mt-4">
+          <IdentityChoice
+            value={showName}
+            onChange={setShowName}
+            labels={{ show: tClaim("showName"), showHint: tClaim("showNameHint"), anon: tClaim("anonymous"), anonHint: tClaim("anonymousHint") }}
+          />
+        </div>
+        <div className="mt-6 grid gap-4 lg:mt-[clamp(10px,2.6vh,24px)] lg:gap-[clamp(8px,1.8vh,16px)]">
+          {error && <Notice>{error}</Notice>}
+          <PrimaryButton onClick={accept} busy={busy}>
+            {t("cta")}
+          </PrimaryButton>
+          <OutlineButton onClick={() => setChoosing(false)} disabled={busy}>
+            {tc("back")}
+          </OutlineButton>
+        </div>
+      </div>
+    );
+
+  // Step 1: review the bottle.
   return (
     <div className="max-w-[440px] lg:pt-2">
       <Display>{t("title")}</Display>
-      <p className="mt-4 font-display text-[22px] tracking-[0.04em] text-copper">{bottle.serial}</p>
-      <Lead className="mt-4">{t("intro")}</Lead>
-      <InfoPanel className="mt-6" rows={rows} />
+      <p className="mt-4 font-display text-[22px] tracking-[0.04em] text-copper lg:mt-[clamp(6px,1.6vh,16px)]">{bottle.serial}</p>
+      <Lead className="mt-4 lg:mt-[clamp(6px,1.6vh,16px)]">{t("intro")}</Lead>
+      <InfoPanel className="mt-6 lg:mt-[clamp(9px,2.67vh,24px)]" rows={rows} />
 
-      <div className="mt-8 grid gap-5">
+      <div className="mt-8 lg:mt-[clamp(12px,3.56vh,32px)] grid gap-5 lg:gap-[clamp(8px,2.22vh,20px)]">
         {error && <Notice>{error}</Notice>}
 
         {!loggedInEmail && (
@@ -123,23 +151,10 @@ export function AcceptFlow({
           </>
         )}
 
-        {loggedInEmail && !wrongAccount && (
-          <>
-            <p className="text-[12px] text-mute">{t("loggedInAs", { email: loggedInEmail })}</p>
-            <Eyebrow>{t("privacyTitle")}</Eyebrow>
-            <IdentityChoice
-              value={showName}
-              onChange={setShowName}
-              labels={{ show: tClaim("showName"), showHint: tClaim("showNameHint"), anon: tClaim("anonymous"), anonHint: tClaim("anonymousHint") }}
-            />
-            <PrimaryButton onClick={accept} busy={busy}>
-              {t("cta")}
-            </PrimaryButton>
-          </>
-        )}
+        {loggedInEmail && !wrongAccount && <PrimaryButton onClick={() => setChoosing(true)}>{t("cta")}</PrimaryButton>}
       </div>
 
-      <a href={siteUrl} className="mt-8 flex items-center justify-center gap-3 text-[12px] text-cream hover:text-white">
+      <a href={siteUrl} className="mt-8 lg:mt-[clamp(12px,3.56vh,32px)] flex items-center justify-center gap-3 text-[12px] text-cream hover:text-white">
         {tc("learnMore")}
         <ArrowRight className="size-3.5" strokeWidth={1.5} />
       </a>

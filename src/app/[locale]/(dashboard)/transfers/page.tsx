@@ -36,7 +36,7 @@ export default async function TransfersPage() {
     <>
       <PageHeading title={t("title")} subtitle={t("subtitle")} />
 
-      <div className="mt-10 grid gap-10 xl:grid-cols-[1fr_300px]">
+      <div className="mt-10 lg:mt-[clamp(16px,4.44vh,40px)] grid gap-10 lg:gap-[clamp(16px,4.44vh,40px)] xl:grid-cols-[1fr_300px]">
         <div>
           <h2 className="text-[11px] tracking-[0.28em] text-copper uppercase">{t("stats")}</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-3">
@@ -49,9 +49,9 @@ export default async function TransfersPage() {
             ))}
           </div>
 
-          <h2 className="mt-12 text-[11px] tracking-[0.28em] text-copper uppercase">{t("recent")}</h2>
+          <h2 className="mt-12 lg:mt-[clamp(19px,5.33vh,48px)] text-[11px] tracking-[0.28em] text-copper uppercase">{t("recent")}</h2>
           {rows.length === 0 ? (
-            <p className="mt-6 text-[13px] text-mute">{t("empty")}</p>
+            <p className="mt-6 lg:mt-[clamp(9px,2.67vh,24px)] text-[13px] text-mute">{t("empty")}</p>
           ) : (
             <ul className="mt-4 divide-y divide-[#2a2420] border-y border-[#2a2420]">
               {rows.map((r) => (

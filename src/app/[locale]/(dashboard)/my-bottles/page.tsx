@@ -23,18 +23,18 @@ export default async function MyBottlesPage() {
 
   if (bottles.length === 0) {
     return (
-      <div className="mx-auto flex max-w-[460px] flex-col items-center pt-10 text-center lg:pt-20">
+      <div className="mx-auto flex max-w-[460px] flex-col items-center pt-10 lg:pt-[clamp(16px,4.44vh,40px)] text-center">
         <Eyebrow className="max-w-[300px] leading-[1.8]">{t("emptyEyebrow")}</Eyebrow>
-        <h1 className="mt-5 font-display text-[34px] text-white sm:text-[40px]">{t("emptyTitle")}</h1>
-        <p className="mt-10 max-w-[360px] text-[13px] leading-relaxed tracking-[0.03em] text-cream-2">{t("emptyText")}</p>
-        <PrimaryLink href="/claim" className="mt-16 max-w-[460px]">
+        <h1 className="mt-5 lg:mt-[clamp(8px,2.22vh,20px)] font-display text-[34px] text-white sm:text-[40px]">{t("emptyTitle")}</h1>
+        <p className="mt-10 lg:mt-[clamp(16px,4.44vh,40px)] max-w-[360px] text-[13px] leading-relaxed tracking-[0.03em] text-cream-2">{t("emptyText")}</p>
+        <PrimaryLink href="/claim" className="mt-16 lg:mt-[clamp(25px,7.11vh,64px)] max-w-[460px]">
           <span className="inline-flex items-center gap-4">
             <ScanLine className="size-5" strokeWidth={1.4} />
             {t("claimFirst")}
           </span>
         </PrimaryLink>
-        <hr className="mt-9 w-full border-[#2e2722]" />
-        <p className="mt-9 text-[11px] text-cream uppercase">{tc("noBottleYet")}</p>
+        <hr className="mt-9 lg:mt-[clamp(14px,4.0vh,36px)] w-full border-[#2e2722]" />
+        <p className="mt-9 lg:mt-[clamp(14px,4.0vh,36px)] text-[11px] text-cream uppercase">{tc("noBottleYet")}</p>
         <a href={process.env.NEXT_PUBLIC_SITE_URL ?? "/"} className="mt-1 text-[12px] text-copper underline underline-offset-4">
           {tc("learnMore")}
         </a>
@@ -44,7 +44,7 @@ export default async function MyBottlesPage() {
 
   return (
     <>
-      <div className="flex flex-wrap items-start justify-between gap-6">
+      <div className="flex flex-wrap items-start justify-between gap-6 lg:gap-[clamp(9px,2.67vh,24px)]">
         <PageHeading title={t("title")} subtitle={t("subtitle")} />
         <Link
           href="/claim"

@@ -47,7 +47,7 @@ export function Sidebar() {
                 href={href}
                 aria-current={active ? "page" : undefined}
                 className={clsx(
-                  "relative flex items-center gap-3.5 px-4 py-3.5 text-[12px] tracking-[0.06em] whitespace-nowrap uppercase transition lg:px-8",
+                  "relative flex items-center gap-3.5 px-4 py-[clamp(9px,1.6vh,14px)] text-[12px] tracking-[0.06em] whitespace-nowrap uppercase transition lg:px-8",
                   active ? "bg-[#1a1613] text-white" : "text-cream hover:text-white",
                 )}
               >
@@ -60,13 +60,13 @@ export function Sidebar() {
         })}
       </ul>
 
-      <div className="mt-auto hidden px-10 pb-10 lg:block">
+      <div className="mt-auto hidden px-10 pb-[clamp(16px,4vh,40px)] lg:block">
         <p className="max-w-[110px] text-[10px] leading-[1.8] tracking-[0.3em] text-mute uppercase">{tc("worldHoldsOnce")}</p>
         <span className="mt-3 block h-px w-7 bg-copper/60" aria-hidden />
         <button
           type="button"
           onClick={logout}
-          className="mt-[150px] flex items-center gap-3 text-[13px] tracking-[0.08em] text-cream hover:text-white"
+          className="mt-[clamp(20px,6vh,64px)] flex items-center gap-3 text-[13px] tracking-[0.08em] text-cream hover:text-white"
         >
           <LogOut className="size-[18px] text-copper" strokeWidth={1.4} />
           {tc("logout")}

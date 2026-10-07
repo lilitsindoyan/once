@@ -31,5 +31,6 @@ export default getRequestConfig(async ({ requestLocale }) => {
   } catch {
     // keep bundled strings
   }
-  return { locale, messages };
+  // One time zone for server and browser rendering, so dates never differ between the two.
+  return { locale, messages, timeZone: process.env.APP_TIMEZONE ?? "Asia/Yerevan" };
 });

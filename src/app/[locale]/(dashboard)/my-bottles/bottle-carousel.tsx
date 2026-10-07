@@ -18,9 +18,9 @@ export function BottleCarousel({ bottles, location }: { bottles: Bottle[]; locat
   const go = (d: number) => setI((x) => (x + d + bottles.length) % bottles.length);
 
   return (
-    <section aria-roledescription="carousel" className="mx-auto mt-4 max-w-[760px] text-center">
+    <section aria-roledescription="carousel" className="mx-auto mt-4 max-w-[760px] text-center lg:mt-0">
       <div className="flex items-center justify-center gap-4">
-        <h2 className="font-display text-[26px] tracking-[0.04em] text-white sm:text-[30px]">{b.serial}</h2>
+        <h2 className="font-display text-[26px] tracking-[0.04em] text-white sm:text-[30px] lg:text-[clamp(20px,3.4vh,30px)]">{b.serial}</h2>
         <span className="rounded-full border border-[#6d625a] px-3 py-1 text-[10px] tracking-[0.1em] text-cream uppercase">{tc("my")}</span>
       </div>
       {many && (
@@ -41,7 +41,7 @@ export function BottleCarousel({ bottles, location }: { bottles: Bottle[]; locat
           width={400}
           height={428}
           priority
-          className="h-[300px] w-auto sm:h-[400px]"
+          className="h-[300px] w-auto sm:h-[400px] lg:h-[clamp(150px,36vh,400px)]"
         />
         {many && (
           <button type="button" onClick={() => go(1)} aria-label={t("next")} className="absolute right-0 p-3 text-copper hover:text-white sm:right-8">
@@ -50,7 +50,7 @@ export function BottleCarousel({ bottles, location }: { bottles: Bottle[]; locat
         )}
       </div>
 
-      <dl className="mx-auto mt-8 grid max-w-[560px] grid-cols-3 text-center">
+      <dl className="mx-auto mt-8 lg:mt-[clamp(12px,3.56vh,32px)] grid max-w-[560px] grid-cols-3 text-center">
         {[
           [t("seriesBatch"), `${b.series} · ${b.batch}`],
           [t("claimedOn"), b.claimedOn],
@@ -63,7 +63,7 @@ export function BottleCarousel({ bottles, location }: { bottles: Bottle[]; locat
         ))}
       </dl>
 
-      <div className="mt-10 flex flex-wrap justify-center gap-5">
+      <div className="mt-10 lg:mt-[clamp(16px,4.44vh,40px)] flex flex-wrap justify-center gap-5 lg:gap-[clamp(8px,2.22vh,20px)]">
         <SmallLink href={`/my-bottles/${b.serial}`} className="min-w-[180px]">
           {t("openPassport")}
         </SmallLink>
