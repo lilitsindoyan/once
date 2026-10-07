@@ -36,7 +36,7 @@ export default async function TransfersPage() {
     <>
       <PageHeading title={t("title")} subtitle={t("subtitle")} />
 
-      <div className="mt-10 lg:mt-[clamp(16px,4.44vh,40px)] grid gap-10 lg:gap-[clamp(16px,4.44vh,40px)] xl:grid-cols-[1fr_300px]">
+      <div className="mt-10 lg:mt-[clamp(16px,4.44vh,40px)] grid gap-10 lg:gap-[clamp(16px,4.44vh,40px)] 2xl:grid-cols-[1fr_300px]">
         <div>
           <h2 className="text-[11px] tracking-[0.28em] text-copper uppercase">{t("stats")}</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-3">
@@ -73,9 +73,19 @@ export default async function TransfersPage() {
                       {t("initiatedOn", { date: format.dateTime(r.createdAt, { dateStyle: "medium", timeStyle: "short" }) })}
                     </p>
                   </div>
-                  <span className={clsx("rounded-full border px-3 py-1 text-[11px] tracking-[0.06em] uppercase", STATUS_TONE[r.status])}>
-                    {r.awaitingMe ? t("awaitingYou") : t(`status.${r.status}`)}
-                  </span>
+                  {r.awaitingMe ? (
+                    <Link
+                      href={`/transfers/${r.id}`}
+                      className="inline-flex items-center gap-2 bg-gradient-to-r from-bronze-1 to-bronze-2 px-4 py-2 text-[11px] tracking-[0.12em] text-white uppercase transition hover:brightness-110"
+                    >
+                      {t("reviewAccept")}
+                      <ArrowRight className="size-3.5" strokeWidth={1.5} />
+                    </Link>
+                  ) : (
+                    <span className={clsx("rounded-full border px-3 py-1 text-[11px] tracking-[0.06em] uppercase", STATUS_TONE[r.status])}>
+                      {t(`status.${r.status}`)}
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>
@@ -84,7 +94,7 @@ export default async function TransfersPage() {
 
         <Link
           href="/claim"
-          className="flex h-fit flex-col gap-4 border border-[#2b241e] bg-[#2a221c]/80 p-6 transition hover:bg-[#3a2e25]"
+          className="hidden h-fit flex-col gap-4 2xl:flex border border-[#2b241e] bg-[#2a221c]/80 p-6 transition hover:bg-[#3a2e25]"
         >
           <ScanLine className="size-6 text-copper" strokeWidth={1.4} />
           <span className="text-[15px] text-white">{t("claimCardTitle")}</span>

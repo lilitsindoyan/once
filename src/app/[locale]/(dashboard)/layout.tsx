@@ -11,7 +11,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <div className="once-texture min-h-screen lg:grid lg:h-dvh lg:min-h-0 lg:grid-cols-[260px_1fr] lg:overflow-hidden">
-      <aside className="border-b border-[#1f1a16] lg:flex lg:h-dvh lg:flex-col lg:border-r lg:border-b-0">
+      <aside className="border-b border-[#1f1a16] lg:flex lg:h-dvh lg:flex-col lg:overflow-y-auto lg:border-r lg:border-b-0">
         <div className="flex items-center justify-between px-4 py-5 lg:block lg:px-12 lg:pt-[clamp(20px,4.5vh,40px)] lg:pb-[clamp(16px,4vh,48px)]">
           <Link href="/my-bottles" aria-label="ONCE">
             <Image src="/once-logo.svg" alt="ONCE" width={150} height={32} priority className="h-6 w-auto lg:h-8" />

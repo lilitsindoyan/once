@@ -9,7 +9,7 @@ import { SmallLink } from "@/components/portal/kit";
 type Bottle = { serial: string; series: string; batch: string; claimedOn: string };
 
 /** One bottle at a time with arrows (design frame 242). */
-export function BottleCarousel({ bottles, location }: { bottles: Bottle[]; location: string }) {
+export function BottleCarousel({ bottles, location, compact = false }: { bottles: Bottle[]; location: string; compact?: boolean }) {
   const t = useTranslations("bottles");
   const tc = useTranslations("common");
   const [i, setI] = useState(0);
@@ -41,7 +41,7 @@ export function BottleCarousel({ bottles, location }: { bottles: Bottle[]; locat
           width={400}
           height={428}
           priority
-          className="h-[300px] w-auto sm:h-[400px] lg:h-[clamp(150px,36vh,400px)]"
+          className={compact ? "h-[300px] w-auto sm:h-[400px] lg:h-[clamp(130px,28vh,340px)]" : "h-[300px] w-auto sm:h-[400px] lg:h-[clamp(150px,36vh,400px)]"}
         />
         {many && (
           <button type="button" onClick={() => go(1)} aria-label={t("next")} className="absolute right-0 p-3 text-copper hover:text-white sm:right-8">

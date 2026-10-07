@@ -86,10 +86,22 @@ export function anonymousLabel(locale: string) {
   return { hy: "Անանուն սեփականատեր", ru: "Анонимный владелец" }[locale] ?? "Anonymous owner";
 }
 
+/**
+ * How a recipient reaches a transfer: the single-use link from the email, or — when already
+ * logged in with the invited email — the transfer id from the Transfers page.
+ */
+export type TransferRef = { token: string } | { id: string };
+
+const whereRef = (ref: TransferRef) => ("token" in ref ? { tokenHash: sha256(ref.token) } : { id: ref.id });
+
 /** Flow 5, step 1: what the Accept page shows, and the link state. */
 export async function getTransferByToken(token: string) {
+  return getTransfer({ token });
+}
+
+export async function getTransfer(ref: TransferRef) {
   const transfer = await db.transfer.findUnique({
-    where: { tokenHash: sha256(token) },
+    where: whereRef(ref),
     include: { bottle: { include: { series: true } } },
   });
   if (!transfer) return { state: "invalid" as const };
@@ -110,10 +122,11 @@ export async function getTransferByToken(token: string) {
 }
 
 /** Flow 5, steps 3–5. The link works once and only for the invited email. */
-export async function acceptTransfer(user: User, token: string, showName: boolean, locale: string) {
+export async function acceptTransfer(user: User, ref: TransferRef | string, showName: boolean, locale: string) {
+  const where = whereRef(typeof ref === "string" ? { token: ref } : ref);
   const result = await db.$transaction(async (tx) => {
     const transfer = await tx.transfer.findUnique({
-      where: { tokenHash: sha256(token) },
+      where,
       include: { bottle: true, sender: true },
     });
     if (!transfer) throw new AppError("link_invalid");
@@ -182,4 +195,13 @@ export async function listMyTransfers(user: User) {
     },
     rows,
   };
+}
+
+/** Invitations waiting for this user (sent to their email, not yet accepted), oldest first. */
+export function listPendingInvites(user: User) {
+  return db.transfer.findMany({
+    where: { recipientEmail: user.email, status: "PENDING" },
+    include: { bottle: true },
+    orderBy: { createdAt: "asc" },
+  });
 }

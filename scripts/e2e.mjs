@@ -55,7 +55,7 @@ class Client {
       else this.jar.set(k, v);
     }
     const data = res.headers.get("content-type")?.includes("json") ? await res.json() : await res.text();
-    return { status: res.status, data };
+    return { status: res.status, data, location: res.headers.get("location") ?? "" };
   }
 }
 
@@ -161,6 +161,8 @@ async function main() {
   check(r.data.error === "link_wrong_email" && r.data.email.startsWith("b•••@"), "other account can't accept (masked hint)");
   const b = new Client("10.0.0.4");
   await login(b, ben, { firstName: "Ben", lastName: "Smith", country: "GB" });
+  r = await b.call("/en/my-bottles");
+  check(r.status === 307 && /\/en\/transfers\/\w+$/.test(r.location), "no bottles + waiting invitation → My Bottles opens the accept flow");
   r = await b.call(`/api/transfer/${token}/accept`, { showName: true, locale: "en" });
   check(r.status === 200 && r.data.serial === b1.serial, "recipient accepted");
   r = await b.call(`/api/transfer/${token}/accept`, { showName: true, locale: "en" });
@@ -180,6 +182,27 @@ async function main() {
   await login(a2, anna, { firstName: "Anna", lastName: "Petrosyan", country: "AM" });
   const annas = await db.user.findMany({ where: { email: anna } });
   check(annas.length === 2 && annas.some((u) => u.status === "CLOSED"), "same email → new account; admin keeps both");
+
+  console.log("\nAccept from the Transfers page (no email link)");
+  const pendingForBen = await db.transfer.findFirst({ where: { recipientEmail: ben, status: "PENDING" } });
+  r = await b.call("/api/me/bottles");
+  const before = r.data.bottles.length;
+  r = await stranger.call(`/api/me/transfers/${pendingForBen.id}/accept`, { showName: true, locale: "en" });
+  check(r.data.error === "link_wrong_email", "another account can't accept by id");
+  r = await stranger.call(`/en/transfers/${pendingForBen.id}`);
+  check(r.status === 404, "another account can't open the accept page");
+  r = await new Client("10.0.0.12").call(`/api/me/transfers/${pendingForBen.id}/accept`, { showName: true, locale: "en" });
+  check(r.status === 401, "accept by id needs login");
+  r = await b.call("/en/my-bottles");
+  check(r.status === 200 && String(r.data).includes("Review &amp; accept"), "owner with bottles sees the invitation banner");
+  r = await b.call(`/en/transfers/${pendingForBen.id}`);
+  check(r.status === 200, "invited user opens the accept page");
+  r = await b.call(`/api/me/transfers/${pendingForBen.id}/accept`, { showName: false, locale: "en" });
+  check(r.status === 200, "invited user accepts from the Transfers page");
+  r = await b.call(`/api/me/transfers/${pendingForBen.id}/accept`, { showName: false, locale: "en" });
+  check(r.data.error === "link_used", "can't accept twice");
+  r = await b.call("/api/me/bottles");
+  check(r.data.bottles.length === before + 1, "bottle is now in My Bottles");
 
   console.log("\nFlow 6 — profile");
   r = await b.call("/api/me/profile", { firstName: "Benjamin", lastName: "Smith" }, "PATCH");

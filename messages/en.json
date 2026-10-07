@@ -133,7 +133,10 @@
     "counter": "{current} of {total}",
     "emptyEyebrow": "You don't have any bottles yet. A new chapter awaits",
     "emptyTitle": "Claim your first bottle",
-    "emptyText": "Enter the serial number and hidden code from your ONCE bottle to add it to your collection and unlock its story."
+    "emptyText": "Enter the serial number and hidden code from your ONCE bottle to add it to your collection and unlock its story.",
+    "inviteTitle": "A bottle has been transferred to you",
+    "inviteText": "{serial} is waiting for you to accept it.",
+    "inviteCta": "Review & accept"
   },
   "passport": {
     "title": "Digital passport",
@@ -270,7 +273,7 @@
     "awaitingRecipient": "Awaiting recipient",
     "awaitingRecipientHint": "Waiting to be accepted",
     "awaitingYou": "Awaiting your action",
-    "awaitingYouHint": "Open the invitation link in your email",
+    "awaitingYouHint": "Accept here or from the link in your email",
     "completed": "Completed",
     "completedHint": "Successfully transferred",
     "recent": "Recent transfers",
@@ -285,6 +288,7 @@
       "REASSIGNED": "Redirected by ONCE"
     },
     "claimCardTitle": "Claim your bottle",
-    "claimCardText": "Enter the serial number and hidden code"
+    "claimCardText": "Enter the serial number and hidden code",
+    "reviewAccept": "Review & accept"
   }
 }

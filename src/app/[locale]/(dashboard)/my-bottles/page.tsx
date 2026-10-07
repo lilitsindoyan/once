@@ -1,8 +1,9 @@
-import { ArrowRight, ScanLine } from "lucide-react";
+import { ArrowLeftRight, ArrowRight, ScanLine } from "lucide-react";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
-import { Link } from "@/i18n/navigation";
+import { Link, redirect } from "@/i18n/navigation";
 import { countryName } from "@/lib/capitals";
 import { listMyBottles } from "@/server/bottles";
+import { listPendingInvites } from "@/server/transfer";
 import { pageUser } from "@/server/guard";
 import { Eyebrow, PageHeading, PrimaryLink } from "@/components/portal/kit";
 import { BottleCarousel } from "./bottle-carousel";
@@ -19,7 +20,10 @@ export default async function MyBottlesPage() {
   const tc = await getTranslations("common");
   const format = await getFormatter();
   const locale = await getLocale();
-  const bottles = await listMyBottles(user.id);
+  const [bottles, invites] = await Promise.all([listMyBottles(user.id), listPendingInvites(user)]);
+
+  // Nothing owned yet but a bottle is waiting: go straight to the accept flow.
+  if (bottles.length === 0 && invites.length > 0) redirect({ href: `/transfers/${invites[0].id}`, locale });
 
   if (bottles.length === 0) {
     return (
@@ -56,6 +60,23 @@ export default async function MyBottlesPage() {
         </Link>
       </div>
 
+      {invites.length > 0 && (
+        <Link
+          href={`/transfers/${invites[0].id}`}
+          className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 border border-copper/60 bg-copper/10 px-6 py-4 transition hover:bg-copper/15 lg:mt-[clamp(8px,2vh,24px)] lg:py-[clamp(8px,1.6vh,16px)]"
+        >
+          <ArrowLeftRight className="size-5 shrink-0 text-copper" strokeWidth={1.4} />
+          <span className="flex-1">
+            <span className="block text-[13px] tracking-[0.06em] text-white uppercase">{t("inviteTitle")}</span>
+            <span className="block text-[12px] text-cream-2">{t("inviteText", { serial: invites[0].bottle.serial })}</span>
+          </span>
+          <span className="inline-flex items-center gap-2 text-[12px] tracking-[0.1em] text-copper uppercase">
+            {t("inviteCta")}
+            <ArrowRight className="size-4" strokeWidth={1.4} />
+          </span>
+        </Link>
+      )}
+
       <BottleCarousel
         bottles={bottles.map((b) => ({
           serial: b.serial,
@@ -64,6 +85,7 @@ export default async function MyBottlesPage() {
           claimedOn: b.claimedAt ? format.dateTime(b.claimedAt, { day: "numeric", month: "short", year: "numeric" }) : "—",
         }))}
         location={countryName(user.country, locale)}
+        compact={invites.length > 0}
       />
     </>
   );

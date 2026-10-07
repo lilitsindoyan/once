@@ -21,7 +21,8 @@ import {
 type Bottle = { serial: string; seriesBatch: string; productionDate: string; from: string; transferredOn: string };
 
 export function AcceptFlow({
-  token,
+  acceptUrl,
+  returnPath,
   bottle,
   loggedInEmail,
   wrongAccount,
@@ -29,7 +30,10 @@ export function AcceptFlow({
   invitedEmail,
   siteUrl,
 }: {
-  token: string;
+  /** API endpoint that accepts: by email-link token, or by transfer id from the Transfers page. */
+  acceptUrl: string;
+  /** Where login sends the person back to. */
+  returnPath: string;
   bottle: Bottle;
   loggedInEmail: string | null;
   wrongAccount: boolean;
@@ -51,7 +55,7 @@ export function AcceptFlow({
   const [done, setDone] = useState(false);
   const [choosing, setChoosing] = useState(false);
 
-  const next = `/accept/${token}`;
+  const next = returnPath;
   const rows: [string, string][] = [
     [t("seriesBatch"), bottle.seriesBatch],
     [t("productionDate"), bottle.productionDate],
@@ -63,7 +67,7 @@ export function AcceptFlow({
     setBusy(true);
     setError(null);
     try {
-      await api(`/api/transfer/${token}/accept`, { showName, locale });
+      await api(acceptUrl, { showName, locale });
       setDone(true);
       router.refresh();
     } catch (e) {
