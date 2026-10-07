@@ -97,6 +97,8 @@ Any Node host with PostgreSQL works (Vercel + Neon/Supabase is the default plan)
 2. `npm run db:deploy` to apply migrations, then `npm run db:seed` once to create the first admin.
 3. `npm run build && npm start`.
 
+**Never set `DEMO_OTP_CODE` on a real deployment.** It makes every email code the same value, for demos only.
+
 ## Open points (see the dev handoff doc)
 
 - Serial and hidden-code format, contact link and email sender domain are to be confirmed by the client.

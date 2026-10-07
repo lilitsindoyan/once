@@ -24,6 +24,15 @@ export function findOpenAccount(email: string) {
   return db.user.findFirst({ where: { email, status: { not: "CLOSED" } } });
 }
 
+/**
+ * DEMO ONLY: when DEMO_OTP_CODE is set to 6 digits, every email code is that value.
+ * Never set it on a real deployment — anyone could log in as anyone.
+ */
+function demoOtpCode(): string | null {
+  const v = process.env.DEMO_OTP_CODE?.trim();
+  return v && /^\d{6}$/.test(v) ? v : null;
+}
+
 export async function issueOtp(email: string, purpose: OtpPurpose, locale: string, userId?: string) {
   const last = await db.otpCode.findFirst({ where: { email, purpose }, orderBy: { createdAt: "desc" } });
   if (last && Date.now() - last.createdAt.getTime() < OTP_RESEND_MS) {
@@ -36,7 +45,7 @@ export async function issueOtp(email: string, purpose: OtpPurpose, locale: strin
   });
   if (lastHour >= OTP_MAX_PER_HOUR) throw new AppError("rate_limited");
 
-  const code = sixDigitCode();
+  const code = demoOtpCode() ?? sixDigitCode();
   await db.otpCode.create({
     data: { email, purpose, userId, codeHash: hashOtp(email, code), expiresAt: new Date(Date.now() + OTP_TTL_MS) },
   });
