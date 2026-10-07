@@ -1,0 +1,222 @@
+// ONCE — bottle ownership platform
+// Source: ToR v1.2 + User Flow (07 Oct 2026)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AccountStatus {
+  ACTIVE
+  CLOSED
+  SUSPENDED
+}
+
+enum BottleStatus {
+  UNCLAIMED
+  OWNED
+  IN_TRANSFER
+  DEACTIVATED
+}
+
+enum TransferStatus {
+  PENDING
+  ACCEPTED
+  CANCELLED
+  REASSIGNED
+}
+
+enum OtpPurpose {
+  LOGIN
+  EMAIL_CHANGE
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  CONTENT_EDITOR
+}
+
+enum PinSource {
+  AUTO
+  MANUAL
+}
+
+/// A user account. Email is unique among ACTIVE accounts only (partial unique index
+/// added in the migration), so a closed account and a new one can share an email.
+model User {
+  id         String        @id @default(cuid())
+  email      String
+  firstName  String
+  lastName   String
+  country    String // ISO 3166-1 alpha-2
+  locale     String        @default("en")
+  status     AccountStatus @default(ACTIVE)
+  createdAt  DateTime      @default(now())
+  closedAt   DateTime?
+
+  bottles           Bottle[]          @relation("CurrentOwner")
+  periods           OwnershipPeriod[]
+  transfersSent     Transfer[]        @relation("Sender")
+  transfersReceived Transfer[]        @relation("Recipient")
+
+  @@index([email])
+}
+
+model OtpCode {
+  id        String     @id @default(cuid())
+  email     String
+  codeHash  String
+  purpose   OtpPurpose
+  userId    String? // set for EMAIL_CHANGE
+  attempts  Int        @default(0)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime   @default(now())
+
+  @@index([email, purpose, createdAt])
+}
+
+model Series {
+  id               String   @id @default(cuid())
+  name             String
+  batchNumber      String
+  quantity         Int
+  productionDate   DateTime?
+  /// Passport template: [{ key, label: {hy,en,ru}, type }]
+  passportTemplate Json     @default("[]")
+  /// Values shared by every bottle in the series: { key: value }. A bottle's own value wins.
+  passportDefaults Json     @default("{}")
+  createdAt        DateTime @default(now())
+
+  bottles Bottle[]
+}
+
+model Bottle {
+  id             String       @id @default(cuid())
+  serial         String       @unique
+  /// AES-256-GCM encrypted hidden code; admin-only.
+  hiddenCodeEnc  String
+  status         BottleStatus @default(UNCLAIMED)
+  /// Status before deactivation, restored on reactivation.
+  statusBeforeDeactivation BottleStatus?
+  seriesId       String
+  series         Series       @relation(fields: [seriesId], references: [id])
+  currentOwnerId String?
+  currentOwner   User?        @relation("CurrentOwner", fields: [currentOwnerId], references: [id])
+  /// Per-bottle values for the series passport template: { key: value } (override the series defaults)
+  passportValues Json         @default("{}")
+  claimedAt      DateTime?
+  createdAt      DateTime     @default(now())
+
+  periods   OwnershipPeriod[]
+  transfers Transfer[]
+
+  @@index([status])
+  @@index([currentOwnerId])
+}
+
+/// One owner's time with a bottle. endedAt = null → current owner.
+/// Feeds the passport ownership history and the public Bottle Owners page.
+model OwnershipPeriod {
+  id            String    @id @default(cuid())
+  bottleId      String
+  bottle        Bottle    @relation(fields: [bottleId], references: [id])
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  startedAt     DateTime  @default(now())
+  endedAt       DateTime?
+  showName      Boolean
+  hiddenByAdmin Boolean   @default(false)
+
+  @@index([bottleId, startedAt])
+  @@index([endedAt, showName])
+}
+
+model Transfer {
+  id              String         @id @default(cuid())
+  bottleId        String
+  bottle          Bottle         @relation(fields: [bottleId], references: [id])
+  senderId        String
+  sender          User           @relation("Sender", fields: [senderId], references: [id])
+  recipientEmail  String
+  recipientId     String?
+  recipient       User?          @relation("Recipient", fields: [recipientId], references: [id])
+  /// SHA-256 of the single-use link token
+  tokenHash       String         @unique
+  status          TransferStatus @default(PENDING)
+  createdAt       DateTime       @default(now())
+  acceptedAt      DateTime?
+  cancelledAt     DateTime?
+
+  @@index([bottleId, status])
+}
+
+model ClaimAttempt {
+  id        String   @id @default(cuid())
+  clientKey String
+  success   Boolean
+  createdAt DateTime @default(now())
+
+  @@index([clientKey, createdAt])
+}
+
+model MapPin {
+  id          String    @id @default(cuid())
+  countryCode String    @unique
+  lat         Float
+  lng         Float
+  visible     Boolean   @default(true)
+  source      PinSource @default(AUTO)
+  createdAt   DateTime  @default(now())
+}
+
+model AdminUser {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String
+  passwordHash String
+  totpSecret   String?
+  totpEnabled  Boolean   @default(false)
+  role         AdminRole @default(SUPER_ADMIN)
+  createdAt    DateTime  @default(now())
+
+  logs AuditLog[]
+}
+
+model AuditLog {
+  id        String    @id @default(cuid())
+  adminId   String
+  admin     AdminUser @relation(fields: [adminId], references: [id])
+  action    String
+  entity    String
+  entityId  String
+  details   Json?
+  createdAt DateTime  @default(now())
+
+  @@index([entity, entityId])
+}
+
+/// Emails in three languages (ToR 4.5). key = otp | claim | transfer_invite | transfer_sent | transfer_completed | transfer_cancelled
+model EmailTemplate {
+  id      String @id @default(cuid())
+  key     String
+  locale  String
+  subject String
+  body    String
+
+  @@unique([key, locale])
+}
+
+/// Static UI strings overriding the bundled message files (ToR 5.4 Language Strings).
+model LanguageString {
+  id     String @id @default(cuid())
+  key    String
+  locale String
+  value  String
+
+  @@unique([key, locale])
+}

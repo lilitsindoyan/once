@@ -1,26 +1,58 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * ONCE design tokens — taken from the Figma landing design (frames 108, 118).
+ * Portal pages use the dark ONCE look; the admin panel uses a neutral light UI kit.
+ */
+@theme {
+  /* Brand */
+  --color-ink: #000000;
+  --color-panel: #151515;
+  --color-panel-2: #1d1a17;
+  --color-line: #3a2f26;
+  --color-copper: #b27649;
+  --color-copper-2: #a97550;
+  --color-copper-border: #b87d4f;
+  --color-cream: #d3c3af;
+  --color-cream-2: #cec2ad;
+  --color-mute: #828282;
+  --color-danger: #d9725f;
+  --color-ok: #8fb07a;
+
+  /* Fonts (set by next/font in the root layout) */
+  --font-display: var(--font-didot), var(--font-noto-serif-armenian), "Didot", "Bodoni 72", serif;
+  --font-serif: var(--font-cormorant), var(--font-noto-serif-armenian), Georgia, serif;
+  --font-sans: var(--font-montserrat), var(--font-noto-sans-armenian), system-ui, sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-ink);
+  color: var(--color-cream-2);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Admin panel: light, neutral UI kit */
+.admin {
+  color-scheme: light;
+  --admin-bg: #f7f7f8;
+  --admin-card: #ffffff;
+  --admin-border: #e4e4e7;
+  --admin-text: #18181b;
+  --admin-mute: #71717a;
+  --admin-accent: #8a5a36;
+  background: var(--admin-bg);
+  color: var(--admin-text);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+}
+
+/* Focus ring visible on dark and light */
+:focus-visible {
+  outline: 2px solid var(--color-copper);
+  outline-offset: 2px;
 }

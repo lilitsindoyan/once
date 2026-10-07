@@ -1,36 +1,104 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ONCE — Bottle Ownership Platform
 
-## Getting Started
+User portal, bottle registry and admin panel for ONCE (ToR v1.2, User Flow of 06 Oct 2026).
+The public landing site is out of scope for this repository.
 
-First, run the development server:
+## What's in it
+
+| Area | Routes | Notes |
+| --- | --- | --- |
+| Login / register | `/[lang]/login` | Email + 6-digit one-time code. One screen for login and registration. |
+| Claim | `/[lang]/claim` (the general QR code points to `/claim`) | Serial + hidden code, checked before login. |
+| My Bottles, passport | `/[lang]/my-bottles`, `/[lang]/my-bottles/[serial]` | Current owner only; the hidden code is never sent to the portal. |
+| Transfer | `/[lang]/my-bottles/[serial]/transfer` | Privacy → email ×2 → warning → sent / account closed. |
+| Accept | `/[lang]/accept/[token]` | Single-use link, only for the invited email, no expiry. |
+| Profile | `/[lang]/profile` | Name, email change with code, email language; country read-only. |
+| Bottle Owners | `/[lang]/owners` | Public list of named current owners, search, newest first. |
+| Admin | `/admin` | Dashboard, series + code generation + CSV/QR, bottles, customers, owners, map pins, emails, language strings, 2FA. |
+
+Languages: `hy`, `en`, `ru`. UI strings live in `messages/*.json`; admins can override any of them in
+Admin → Language strings. Armenian and Russian texts are working drafts until the client supplies final translations.
+
+The portal screens have no Figma design yet. They use the ONCE style from the landing design
+(black, copper `#b27649`, cream `#d3c3af`, Didot / Cormorant Garamond / Montserrat) and are responsive.
+
+## Stack
+
+Next.js 15 (App Router) · TypeScript · Tailwind CSS 4 · next-intl · PostgreSQL + Prisma · jose (JWT cookies) ·
+bcrypt + TOTP (otplib) for admins · Postmark for email (or console output in development).
+
+## Run it locally
+
+Requirements: Node 20+, PostgreSQL 14+.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env            # then fill in the secrets (openssl rand -base64 48)
+npm install
+npm run db:migrate              # creates the tables
+npm run db:seed:demo            # first admin + a demo series of 20 bottles (prints 3 serial/code pairs)
+npm run dev                     # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Admin: `http://localhost:3000/admin`, with `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` from `.env`.
+Turn on two-factor authentication in Admin → My account.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+With `EMAIL_PROVIDER="console"` every email (including login codes) is printed in the server log.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Checks
 
-## Learn More
+```bash
+npm run typecheck
+npm run lint
+npm test                                        # unit tests (serials, codes, encryption, redirects)
+npm run build && npm start > server.log 2>&1 &  # then:
+node scripts/e2e.mjs http://localhost:3000 server.log   # 51 end-to-end checks of every user flow
+```
 
-To learn more about Next.js, take a look at the following resources:
+The end-to-end script needs `npm run db:seed:demo` first (it uses unclaimed demo bottles).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## How it works
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+src/
+  app/[locale]/…          portal pages (server components + small client flows)
+  app/admin/…             admin pages; mutations are server actions in app/admin/actions.ts
+  app/api/…               JSON API used by the portal (and admin file downloads)
+  server/                 business rules — one file per flow (auth, claim, bottles, transfer, profile, owners)
+  server/admin/           admin rules (series, bottles, customers, content, auth)
+  lib/                    crypto, sessions, email, env, country capitals
+prisma/schema.prisma      data model
+messages/*.json           UI strings
+```
 
-## Deploy on Vercel
+Key rules, and where they live:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Claim check** (`server/claim.ts`): wrong serial and wrong code return the same error; 5 failures in 15 minutes per
+  client block further tries; the bottle is remembered in a signed cookie through login/registration.
+- **One open account per email**: a partial unique index (`User_email_open_key`). Closed accounts keep their email,
+  so a returning buyer gets a new account and admin sees both.
+- **Transfer** (`server/transfer.ts`): on confirm the bottle goes to In Transfer and leaves the sender at once; the
+  sender's ownership period closes with the privacy choice made at transfer; last bottle out → account Closed and
+  logged out. Link tokens are stored hashed.
+- **Ownership history** = `OwnershipPeriod` rows. The open period is the current owner; it also drives Bottle Owners.
+- **Hidden codes** are encrypted (AES-256-GCM) with `HIDDEN_CODE_KEY`, readable by admins only. Never change that key
+  once bottles exist.
+- **Map pins** (`server/pins.ts`): added on the capital of the owner's country at the first claim or acceptance from
+  that country (`lib/capitals.ts`). Admin can move, hide or add pins. `/api/map-pins` serves them to the landing.
+- **Passport fields** are defined per series. Values set on the series apply to every bottle; a value set on one
+  bottle replaces it for that bottle.
+- **Admin cancel** returns the bottle to the sender and reopens a closed sender account — unless that person has
+  since opened a new account with the same email; then the bottle goes to the new account.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Deploy
+
+Any Node host with PostgreSQL works (Vercel + Neon/Supabase is the default plan). Per environment:
+
+1. Set every variable from `.env.example` (`APP_URL` = the public URL; `EMAIL_PROVIDER="postmark"` + `POSTMARK_TOKEN`).
+2. `npm run db:deploy` to apply migrations, then `npm run db:seed` once to create the first admin.
+3. `npm run build && npm start`.
+
+## Open points (see the dev handoff doc)
+
+- Serial and hidden-code format, contact link and email sender domain are to be confirmed by the client.
+- Didot needs a web licence; GFS Didot stands in for now.
+- Portal screens will be restyled when the designs arrive.
