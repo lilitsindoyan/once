@@ -3,12 +3,12 @@
 import Image from "next/image";
 import { ArrowDown, ArrowRight, ArrowUp } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useCallback, useState } from "react";
+import { Fragment, useCallback, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import type { LandingPin } from "@/server/landing";
 import { LandingChrome, SECTIONS } from "./chrome";
 import { ContactForm } from "./contact-form";
-import { useActiveSection, useReveal, useSceneProgress } from "./hooks";
+import { useActiveSection, useParallax, useReveal, useSceneProgress } from "./hooks";
 import { Loader } from "./loader";
 import { scrollToSection, useSmoothScroll } from "./smooth-scroll";
 import { WorldMap } from "./world-map";
@@ -17,6 +17,21 @@ import { WorldMap } from "./world-map";
 const PAD = "px-6 sm:px-12 lg:pr-[clamp(48px,5vw,80px)] lg:pl-[clamp(200px,16vw,256px)]";
 const TITLE = "font-display text-white leading-[1.06]";
 const BODY = "text-[15px] leading-[1.75] tracking-[0.02em] text-cream-2 sm:text-[16px]";
+
+/** A title whose words rise one after another when its section comes on screen. */
+function Words({ text, delay = 0 }: { text: string; delay?: number }) {
+  return (
+    <span className="words" style={{ ["--d" as string]: `${delay}ms` }}>
+      {text.split(" ").map((w, i) => (
+        <Fragment key={i}>
+          <span className="w">
+            <span style={{ ["--i" as string]: i }}>{w}</span>
+          </span>{" "}
+        </Fragment>
+      ))}
+    </span>
+  );
+}
 
 /**
  * Public landing — Figma landing frames 99–122, in prototype order:
@@ -36,6 +51,7 @@ export function Landing({
   contactEmail?: string;
 }) {
   useSmoothScroll();
+  useParallax();
   const active = useActiveSection(SECTIONS);
   const [chrome, setChrome] = useState(false);
   const onHero = useCallback((p: number) => setChrome((c) => (p > 0.55 ? true : p < 0.45 ? false : c)), []);
@@ -80,14 +96,21 @@ function Hero({ onProgress }: { onProgress: (p: number) => void }) {
             clipPath: "circle(calc(14% + min(var(--p) * 1.6, 1) * 62%) at 50% 50%)",
           }}
         >
-          <Image
-            src="/landing/hero.jpg"
-            alt={t("heroAlt")}
-            width={472}
-            height={505}
-            priority
-            className="h-auto max-h-[78dvh] w-[88vw] object-contain sm:w-auto sm:h-[78dvh]"
+          <div
+            aria-hidden
+            className="absolute size-[min(70vh,80vw)] rounded-full bg-[radial-gradient(circle,rgba(190,90,30,0.35),transparent_62%)] blur-2xl"
+            style={{ opacity: "clamp(0, calc((var(--p) - 0.5) * 2.5), 1)" }}
           />
+          <div className="float relative">
+            <Image
+              src="/landing/hero.jpg"
+              alt={t("heroAlt")}
+              width={472}
+              height={505}
+              priority
+              className="h-auto max-h-[78dvh] w-[88vw] object-contain sm:w-auto sm:h-[78dvh]"
+            />
+          </div>
         </div>
 
         {/* Intro mark: line · ONCE · line · 40 years aged exclusive blend */}
@@ -123,15 +146,15 @@ function BornOfTradition() {
   const t = useTranslations("landing");
   const ref = useReveal<HTMLElement>();
   return (
-    <section ref={ref} data-snap className="relative flex min-h-dvh items-center overflow-hidden py-28">
+    <section ref={ref} data-snap data-px className="relative flex min-h-dvh items-center overflow-hidden py-28">
       <div className="reveal-img absolute inset-y-0 right-0 w-full lg:w-[62%]">
-        <Image src="/landing/about.jpg" alt="" fill sizes="(min-width:1024px) 62vw, 100vw" className="object-cover opacity-70" />
+        <Image src="/landing/about.jpg" alt="" fill sizes="(min-width:1024px) 62vw, 100vw" className="px-img object-cover opacity-70" />
         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-black/10" />
         <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black to-transparent" />
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black to-transparent" />
       </div>
-      <div className={`relative grid w-full gap-10 lg:grid-cols-[1fr_minmax(280px,392px)] lg:items-end ${PAD}`}>
-        <h2 className={`reveal max-w-[600px] text-[44px] uppercase sm:text-[60px] lg:text-[clamp(52px,6.2vw,90px)] ${TITLE}`}>{t("aboutTitle")}</h2>
+      <div className={`px-text relative grid w-full gap-10 lg:grid-cols-[1fr_minmax(280px,392px)] lg:items-end ${PAD}`}>
+        <h2 className={`max-w-[600px] text-[44px] uppercase sm:text-[60px] lg:text-[clamp(52px,6.2vw,90px)] ${TITLE}`}><Words text={t("aboutTitle")} /></h2>
         <p className={`reveal ${BODY} lg:pb-6`} style={{ ["--d" as string]: "250ms" }}>
           {t("aboutText")}
         </p>
@@ -144,15 +167,15 @@ function CraftOfOnce() {
   const t = useTranslations("landing");
   const ref = useReveal<HTMLElement>();
   return (
-    <section ref={ref} data-snap className="relative min-h-dvh overflow-hidden">
+    <section ref={ref} data-snap data-px className="relative min-h-dvh overflow-hidden">
       <div className="reveal-img absolute inset-0 lg:left-[37%]">
-        <Image src="/landing/craft.jpg" alt="" fill sizes="(min-width:1024px) 63vw, 100vw" className="object-cover object-left opacity-80" />
+        <Image src="/landing/craft.jpg" alt="" fill sizes="(min-width:1024px) 63vw, 100vw" className="px-img object-cover object-left opacity-80" />
         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/20 to-black/50" />
       </div>
       <div className="absolute inset-y-0 left-0 hidden w-[37%] bg-black lg:block" />
-      <div className={`relative flex min-h-dvh flex-col justify-between gap-16 py-28 lg:py-[clamp(96px,15vh,135px)] ${PAD}`}>
+      <div className={`px-text relative flex min-h-dvh flex-col justify-between gap-16 py-28 lg:py-[clamp(96px,15vh,135px)] ${PAD}`}>
         <div className="lg:ml-auto lg:w-[min(491px,40vw)]">
-          <h2 className={`reveal text-[44px] uppercase sm:text-[60px] lg:text-[clamp(52px,6vw,86px)] ${TITLE}`}>{t("craftTitle")}</h2>
+          <h2 className={`text-[44px] uppercase sm:text-[60px] lg:text-[clamp(52px,6vw,86px)] ${TITLE}`}><Words text={t("craftTitle")} /></h2>
           <p className="reveal mt-4 text-[13px] tracking-[0.32em] text-cream uppercase" style={{ ["--d" as string]: "200ms" }}>
             {t("craftEyebrow")}
           </p>
@@ -169,9 +192,9 @@ function FourDecades() {
   const t = useTranslations("landing");
   const ref = useReveal<HTMLElement>(0.3);
   return (
-    <section ref={ref} data-snap className="relative flex min-h-dvh flex-col items-center overflow-hidden pt-28 lg:pt-[clamp(110px,15vh,140px)]">
+    <section ref={ref} data-snap data-px className="relative flex min-h-dvh flex-col items-center overflow-hidden pt-28 lg:pt-[clamp(110px,15vh,140px)]">
       <p className="reveal max-w-[492px] px-6 text-center font-display text-[22px] leading-[1.4] text-cream sm:text-[26px]">{t("decadesText")}</p>
-      <span className="reveal mt-5 h-px w-[266px] bg-gradient-to-r from-transparent via-copper to-transparent" style={{ ["--d" as string]: "200ms" }} />
+      <span className="draw-line mt-5 h-px w-[266px] bg-gradient-to-r from-transparent via-copper to-transparent" style={{ ["--d" as string]: "300ms" }} />
       <div className="reveal-img relative mt-6 w-full flex-1" style={{ ["--d" as string]: "250ms" }}>
         <Image src="/landing/product.jpg" alt={t("heroAlt")} fill sizes="100vw" className="object-contain object-top" />
       </div>
@@ -184,13 +207,13 @@ function Essence() {
   const ref = useReveal<HTMLElement>();
   const lines = ["essence1", "essence2", "essence3", "essence4"] as const;
   return (
-    <section ref={ref} data-snap className="landing-glow relative flex min-h-dvh items-center py-28">
-      <div className={`w-full ${PAD}`}>
-        <h2 className={`reveal max-w-[560px] text-[44px] sm:text-[60px] lg:text-[clamp(52px,6vw,86px)] ${TITLE}`}>{t("essenceTitle")}</h2>
+    <section ref={ref} data-snap data-px className="landing-glow relative flex min-h-dvh items-center py-28">
+      <div className={`px-text w-full ${PAD}`}>
+        <h2 className={`max-w-[560px] text-[44px] sm:text-[60px] lg:text-[clamp(52px,6vw,86px)] ${TITLE}`}><Words text={t("essenceTitle")} /></h2>
         <ul className="mt-[clamp(40px,9vh,80px)] space-y-[clamp(14px,2.6vh,24px)]">
           {lines.map((k, i) => (
             <li key={k} className="reveal flex items-baseline gap-4" style={{ ["--d" as string]: `${200 + i * 140}ms` }}>
-              <span className="size-[7px] shrink-0 -translate-y-[5px] rounded-full bg-copper" aria-hidden />
+              <span className="reveal-dot size-[7px] shrink-0 -translate-y-[5px] rounded-full bg-copper" aria-hidden />
               <span className="font-display text-[22px] leading-snug text-cream sm:text-[clamp(22px,2.2vw,32px)]">{t(k)}</span>
             </li>
           ))}
@@ -204,14 +227,14 @@ function Workshop() {
   const t = useTranslations("landing");
   const ref = useReveal<HTMLElement>();
   return (
-    <section ref={ref} data-snap className="relative flex min-h-dvh items-center overflow-hidden py-24">
+    <section ref={ref} data-snap data-px className="relative flex min-h-dvh items-center overflow-hidden py-24">
       <div className="reveal-img absolute inset-0 lg:left-[6%]">
-        <Image src="/landing/workshop.jpg" alt="" fill sizes="94vw" className="object-cover object-right opacity-70" />
+        <Image src="/landing/workshop.jpg" alt="" fill sizes="94vw" className="px-img object-cover object-right opacity-70" />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-black/40" />
         <div className="absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r from-black to-transparent" />
       </div>
-      <div className={`relative w-full ${PAD}`}>
-        <h2 className={`reveal max-w-[491px] text-[44px] uppercase sm:text-[60px] lg:text-[clamp(52px,6vw,86px)] ${TITLE}`}>{t("craftTitle")}</h2>
+      <div className={`px-text relative w-full ${PAD}`}>
+        <h2 className={`max-w-[491px] text-[44px] uppercase sm:text-[60px] lg:text-[clamp(52px,6vw,86px)] ${TITLE}`}><Words text={t("craftTitle")} /></h2>
         <p className="reveal mt-5 max-w-[360px] text-[13px] leading-[2.2] tracking-[0.32em] text-cream uppercase" style={{ ["--d" as string]: "200ms" }}>
           {t("workshopText")}
         </p>
@@ -226,17 +249,17 @@ function History() {
   const t = useTranslations("landing");
   const ref = useReveal<HTMLElement>();
   return (
-    <section ref={ref} id="history" data-nav="history" data-snap className="relative flex min-h-dvh flex-col justify-center overflow-hidden py-28">
+    <section ref={ref} id="history" data-nav="history" data-snap data-px className="relative flex min-h-dvh flex-col justify-center overflow-hidden py-28">
       <div className="reveal-img absolute inset-0">
-        <Image src="/landing/history.jpg" alt="" fill sizes="100vw" className="object-cover opacity-45" />
+        <Image src="/landing/history.jpg" alt="" fill sizes="100vw" className="px-img object-cover opacity-45" />
         <div className="absolute inset-0 bg-gradient-to-b from-black via-black/50 to-black" />
       </div>
-      <div className={`relative ${PAD}`}>
-        <h2 className={`reveal max-w-[1105px] text-[34px] uppercase sm:text-[46px] lg:text-[clamp(40px,4.4vw,64px)] ${TITLE}`}>
-          {t("historyTitle")} <span className="text-cream">{t("historySub")}</span>
+      <div className={`px-text relative ${PAD}`}>
+        <h2 className={`max-w-[1105px] text-[34px] uppercase sm:text-[46px] lg:text-[clamp(40px,4.4vw,64px)] ${TITLE}`}>
+          <Words text={t("historyTitle")} /> <span className="text-cream"><Words text={t("historySub")} delay={420} /></span>
         </h2>
         <div className="mx-auto mt-[clamp(32px,6vh,56px)] max-w-[475px] lg:ml-[clamp(120px,26vw,315px)]">
-          <span className="reveal block h-px w-[min(354px,70vw)] bg-gradient-to-r from-copper to-transparent" style={{ ["--d" as string]: "200ms" }} />
+          <span className="draw-line block h-px w-[min(354px,70vw)] bg-gradient-to-r from-copper to-transparent" style={{ ["--d" as string]: "600ms" }} />
           <p className={`reveal mt-8 ${BODY}`} style={{ ["--d" as string]: "320ms" }}>
             {t("historyText")}
           </p>
@@ -321,17 +344,17 @@ function Ownership() {
   const t = useTranslations("landing");
   const ref = useReveal<HTMLElement>(0.15);
   return (
-    <section ref={ref} id="ownership" data-nav="ownership" data-snap className="once-texture relative flex min-h-dvh items-center py-28">
-      <div className={`w-full ${PAD}`}>
+    <section ref={ref} id="ownership" data-nav="ownership" data-snap data-px className="once-texture relative flex min-h-dvh items-center py-28">
+      <div className={`px-text w-full ${PAD}`}>
         <p className="reveal text-[15px] tracking-[0.08em] text-copper uppercase sm:text-[17px]">{t("ownEyebrow")}</p>
-        <h2 className={`reveal mt-1 text-[40px] sm:text-[52px] lg:text-[clamp(40px,4.2vw,60px)] ${TITLE}`} style={{ ["--d" as string]: "100ms" }}>
-          {t("ownTitle")}
+        <h2 className={`mt-1 text-[40px] sm:text-[52px] lg:text-[clamp(40px,4.2vw,60px)] ${TITLE}`} style={{ ["--d" as string]: "100ms" }}>
+          <Words text={t("ownTitle")} delay={100} />
         </h2>
         <ol className="mt-[clamp(32px,7vh,72px)] grid gap-12 sm:grid-cols-2 xl:grid-cols-4 xl:gap-8">
           {([1, 2, 3, 4] as const).map((n, i) => (
             <li key={n} className="reveal flex flex-col items-center text-center" style={{ ["--d" as string]: `${200 + i * 150}ms` }}>
               <span className="font-display text-[32px] text-copper">{String(n).padStart(2, "0")}</span>
-              <span className="mt-[clamp(20px,5vh,56px)] flex h-[72px] items-center text-copper">{STEP_ICONS[i]}</span>
+              <span className="draw-svg mt-[clamp(20px,5vh,56px)] flex h-[72px] items-center text-copper">{STEP_ICONS[i]}</span>
               <h3 className="mt-[clamp(20px,5vh,56px)] font-display text-[26px] text-cream">{t(`step${n}Title`)}</h3>
               <p className="mt-3 max-w-[270px] text-[13px] leading-[1.7] text-cream-2">{t(`step${n}Text`)}</p>
             </li>
@@ -353,15 +376,15 @@ function MapSection({ pins, countryNames }: { pins: LandingPin[]; countryNames: 
   const t = useTranslations("landing");
   const ref = useReveal<HTMLElement>(0.15);
   return (
-    <section ref={ref} id="map" data-nav="map" data-snap className="relative flex min-h-dvh flex-col justify-center overflow-hidden bg-black py-24 lg:py-16">
+    <section ref={ref} id="map" data-nav="map" data-snap data-px className="relative flex min-h-dvh flex-col justify-center overflow-hidden bg-black py-24 lg:py-16">
       <div className="pointer-events-none absolute -bottom-40 -left-40 size-[620px] rounded-full bg-[radial-gradient(circle,rgba(150,66,22,0.35),transparent_65%)]" />
       <div className="relative mx-auto w-full max-w-[1300px] lg:pr-12 lg:pl-[clamp(150px,11vw,200px)]">
         <div className="reveal-img lg:ml-auto lg:w-[min(100%,calc(84dvh*1.497))]">
           <WorldMap pins={pins} countryName={countryNames} />
         </div>
       </div>
-      <div className={`relative mt-10 lg:absolute lg:bottom-[clamp(48px,10vh,96px)] lg:left-0 lg:mt-0 ${PAD}`}>
-        <h2 className={`reveal max-w-[300px] text-[40px] sm:text-[clamp(40px,3.6vw,52px)] ${TITLE} !text-cream`}>{t("mapTitle")}</h2>
+      <div className={`px-text relative mt-10 lg:absolute lg:bottom-[clamp(48px,10vh,96px)] lg:left-0 lg:mt-0 ${PAD}`}>
+        <h2 className={`max-w-[300px] text-[40px] sm:text-[clamp(40px,3.6vw,52px)] ${TITLE} !text-cream`}><Words text={t("mapTitle")} /></h2>
         <p className="reveal mt-4 max-w-[270px] text-[13px] leading-[1.7] tracking-[0.06em] text-mute uppercase" style={{ ["--d" as string]: "150ms" }}>
           {t("mapText")}
         </p>
@@ -384,10 +407,10 @@ function Contact({ email }: { email?: string }) {
   const t = useTranslations("landing");
   const ref = useReveal<HTMLElement>(0.15);
   return (
-    <section ref={ref} id="contact" data-nav="contact" data-snap className="landing-glow relative flex min-h-dvh flex-col py-28 lg:py-[clamp(96px,18vh,183px)]">
-      <div className={`w-full flex-1 ${PAD}`}>
+    <section ref={ref} id="contact" data-nav="contact" data-snap data-px className="landing-glow relative flex min-h-dvh flex-col py-28 lg:py-[clamp(96px,18vh,183px)]">
+      <div className={`px-text w-full flex-1 ${PAD}`}>
         <div className="mx-auto max-w-[760px]">
-          <h2 className={`reveal text-[44px] uppercase sm:text-[56px] ${TITLE}`}>{t("contactTitle")}</h2>
+          <h2 className={`text-[44px] uppercase sm:text-[56px] ${TITLE}`}><Words text={t("contactTitle")} /></h2>
           <p className="reveal mt-3 text-[16px] text-cream-2" style={{ ["--d" as string]: "120ms" }}>
             {t("contactText")}
           </p>

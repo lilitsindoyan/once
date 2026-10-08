@@ -2,7 +2,10 @@
 
 import { useEffect, useRef, useState, type RefObject } from "react";
 
-/** Adds data-in to the element once it scrolls into view (drives .reveal / .reveal-img). */
+/**
+ * Adds data-in while the element is on screen (drives .reveal, .words, .draw-*), and removes it once the
+ * element has fully left, so the entrance plays again each time a screen comes back.
+ */
 export function useReveal<T extends HTMLElement>(threshold = 0.2): RefObject<T | null> {
   const ref = useRef<T>(null);
   useEffect(() => {
@@ -10,17 +13,45 @@ export function useReveal<T extends HTMLElement>(threshold = 0.2): RefObject<T |
     if (!el) return;
     const io = new IntersectionObserver(
       ([e]) => {
-        if (e.isIntersecting) {
-          el.setAttribute("data-in", "");
-          io.disconnect();
-        }
+        if (e.intersectionRatio >= threshold) el.setAttribute("data-in", "");
+        else if (!e.isIntersecting) el.removeAttribute("data-in");
       },
-      { threshold },
+      { threshold: [0, threshold] },
     );
     io.observe(el);
     return () => io.disconnect();
   }, [threshold]);
   return ref;
+}
+
+/** Sets --v (−1 … 1, offset of the section from the screen centre) and --a = |v| on every [data-px] section. */
+export function useParallax() {
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const vh = window.innerHeight;
+      for (const el of document.querySelectorAll<HTMLElement>("[data-px]")) {
+        const r = el.getBoundingClientRect();
+        if (r.bottom < -vh || r.top > 2 * vh) continue;
+        const v = Math.max(-1, Math.min(1, (r.top + Math.min(r.height, vh) / 2 - vh / 2) / vh));
+        el.style.setProperty("--v", v.toFixed(4));
+        el.style.setProperty("--a", Math.abs(v).toFixed(4));
+      }
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      cancelAnimationFrame(frame);
+    };
+  }, []);
 }
 
 /**

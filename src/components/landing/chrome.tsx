@@ -4,7 +4,7 @@ import clsx from "clsx";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { scrollToSection } from "./smooth-scroll";
@@ -30,6 +30,18 @@ export function LandingChrome({
   const t = useTranslations("landing");
   const tc = useTranslations("common");
   const [open, setOpen] = useState(false);
+  const railRef = useRef<HTMLOListElement>(null);
+  const [dotTop, setDotTop] = useState(4);
+
+  useEffect(() => {
+    const place = () => {
+      const li = railRef.current?.children[SECTIONS.indexOf(active)] as HTMLElement | undefined;
+      if (li) setDotTop(li.offsetTop + 3);
+    };
+    place();
+    window.addEventListener("resize", place);
+    return () => window.removeEventListener("resize", place);
+  }, [active]);
 
   useEffect(() => {
     if (!open) return;
@@ -53,22 +65,13 @@ export function LandingChrome({
   };
 
   const item = (id: SectionId, i: number, big = false) => (
-    <li key={id}>
+    <li key={id} className={big ? "menu-in" : undefined} style={big ? { ["--d" as string]: `${80 + i * 60}ms` } : undefined}>
       <Link
         href={{ pathname: "/", hash: id }}
         onClick={go(id)}
         aria-current={active === id ? "true" : undefined}
         className="group relative block"
       >
-        {!big && (
-          <span
-            aria-hidden
-            className={clsx(
-              "absolute top-[3px] -left-[25px] size-[11px] rounded-full border transition-all duration-500",
-              active === id ? "border-white bg-black opacity-100" : "border-transparent opacity-0",
-            )}
-          />
-        )}
         <span className={clsx("block font-serif text-mute", big ? "text-[15px]" : "text-[13px] leading-none")}>{String(i + 1).padStart(2, "0")}</span>
         <span
           className={clsx(
@@ -110,8 +113,15 @@ export function LandingChrome({
 
       {/* Desktop side menu */}
       <nav aria-label={t("menu")} className="fixed top-1/2 left-[36px] z-30 hidden -translate-y-1/2 lg:block">
-        <ol className="relative flex flex-col gap-[clamp(22px,4.6vh,46px)] border-l border-white/40 py-1 pl-[19px]">
+        <ol ref={railRef} className="relative flex flex-col gap-[clamp(22px,4.6vh,46px)] border-l border-white/40 py-1 pl-[19px]">
           {SECTIONS.map((id, i) => item(id, i))}
+          {/* Copper progress along the rail and the marker that glides to the current section */}
+          <span aria-hidden className="absolute top-0 -left-px w-px bg-copper transition-[height] duration-700 ease-out" style={{ height: dotTop + 6 }} />
+          <span
+            aria-hidden
+            className="absolute -left-[6px] size-[11px] rounded-full border border-white bg-black transition-[top] duration-700 ease-[cubic-bezier(0.6,0,0.2,1)]"
+            style={{ top: dotTop }}
+          />
         </ol>
       </nav>
 
