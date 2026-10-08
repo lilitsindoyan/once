@@ -104,6 +104,15 @@ Any Node host with PostgreSQL works (Vercel + Neon/Supabase is the default plan)
 2. `npm run db:deploy` to apply migrations, then `npm run db:seed` once to create the first admin.
 3. `npm run build && npm start`.
 
+### Auto-deploy (Vercel demo)
+
+The Vercel project is linked to the GitHub repo, so no manual deploy is needed:
+
+- **Push to `main`** → production deploy. `npm run vercel-build` applies pending migrations (`prisma migrate deploy`) before building, so new tables reach Neon automatically.
+- **Push to any other branch / open a PR** → preview deploy with its own URL. Migrations are skipped there, so previews never change the database schema.
+- A failed migration stops the build, and the previous deploy stays live.
+- Seeding the first admin (`npm run db:seed`) is still a one-time manual step.
+
 **Never set `DEMO_OTP_CODE` on a real deployment.** It makes every email code the same value, for demos only.
 
 ## Open points (see the dev handoff doc)
