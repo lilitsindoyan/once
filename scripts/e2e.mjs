@@ -231,6 +231,20 @@ async function main() {
   r = await new Client("10.0.0.11").call("/api/admin/customers/export");
   check(r.status === 401, "admin export needs admin login");
 
+  console.log("\nLanding + Contact form");
+  const home = await fetch(`${BASE}/en`);
+  const html = await home.text();
+  check(home.status === 200 && html.includes("Welcome to ONCE") && html.includes('id="map"'), "landing renders with loader and map");
+  const visitor = new Client(`10.0.1.${Date.now() % 250}`);
+  r = await visitor.call("/api/contact", { name: "Ani", email: "not-an-email", message: "Hi", locale: "en" });
+  check(r.status === 400, "contact rejects a bad email");
+  r = await visitor.call("/api/contact", { name: "Ani", email: "ani@example.com", message: "Do you ship to Paris?", locale: "en" });
+  check(r.status === 200, "contact message accepted");
+  check((await db.contactMessage.count({ where: { email: "ani@example.com", message: "Do you ship to Paris?" } })) >= 1, "contact message stored for the admin");
+  for (let i = 0; i < 4; i++) await visitor.call("/api/contact", { name: "Ani", email: "ani@example.com", message: `more ${i}`, locale: "en" });
+  r = await visitor.call("/api/contact", { name: "Ani", email: "ani@example.com", message: "one too many", locale: "en" });
+  check(r.status === 429, "6th message in an hour is rate limited");
+
   console.log(`\nAll ${passed} checks passed.`);
 }
 

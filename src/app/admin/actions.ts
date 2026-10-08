@@ -15,6 +15,7 @@ import { createSeries, updateSeriesDefaults, updateSeriesTemplate } from "@/serv
 import { cancelTransfer, reassignBottle, resendInvite, setDeactivated, updatePassportValues } from "@/server/admin/bottles";
 import { setCustomerStatus, updateCustomer } from "@/server/admin/customers";
 import { saveEmailTemplate, saveLanguageString, savePin, setOwnerEntryHidden } from "@/server/admin/content";
+import { setMessageRead } from "@/server/admin/messages";
 import type { PassportField } from "@/server/bottles";
 import type { EmailKey } from "@/lib/email-defaults";
 
@@ -218,4 +219,11 @@ export async function languageStringAction(fd: FormData) {
       await saveLanguageString(admin, key, locale, String(fd.get(locale) ?? ""));
     }
   });
+}
+
+export async function messageReadAction(fd: FormData) {
+  const back = str(fd, "back") || "/admin/messages";
+  await act(back.startsWith("/admin/messages") ? back : "/admin/messages", "Saved.", async () =>
+    setMessageRead(await requireAdmin(), str(fd, "id"), str(fd, "read") === "1"),
+  );
 }

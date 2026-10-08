@@ -1,11 +1,13 @@
-import { SiteHeader } from "@/components/site-header";
+import { getCurrentUser } from "@/server/auth";
+import { LandingChrome } from "@/components/landing/chrome";
 
-/** Public pages that sit outside the portal frame (Bottle Owners). */
-export default function PublicLayout({ children }: { children: React.ReactNode }) {
+/** Public pages next to the landing (Bottle Owners): same header and side menu as the landing. */
+export default async function PublicLayout({ children }: { children: React.ReactNode }) {
+  const user = await getCurrentUser();
   return (
-    <>
-      <SiteHeader />
-      <main className="mx-auto w-full max-w-5xl px-4 pt-8 pb-24 sm:px-8 sm:pt-12">{children}</main>
-    </>
+    <div className="landing-glow min-h-dvh">
+      <LandingChrome active="map" loggedIn={!!user} onLanding={false} />
+      <main className="px-6 pt-28 pb-24 sm:px-12 sm:pt-36 lg:pr-[clamp(48px,5vw,80px)] lg:pl-[clamp(200px,16vw,256px)]">{children}</main>
+    </div>
   );
 }

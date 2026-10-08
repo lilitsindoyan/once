@@ -220,3 +220,18 @@ model LanguageString {
 
   @@unique([key, locale])
 }
+
+/// Landing page Contact form. Read in the admin panel.
+model ContactMessage {
+  id        String    @id @default(cuid())
+  name      String
+  email     String
+  message   String
+  locale    String
+  clientKey String
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([createdAt])
+  @@index([clientKey, createdAt])
+}

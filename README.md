@@ -1,12 +1,12 @@
 # ONCE — Bottle Ownership Platform
 
-User portal, bottle registry and admin panel for ONCE (ToR v1.2, User Flow of 06 Oct 2026).
-The public landing site is out of scope for this repository.
+Public landing, user portal, bottle registry and admin panel for ONCE (ToR v1.2, User Flow of 06 Oct 2026).
 
 ## What's in it
 
 | Area | Routes | Notes |
 | --- | --- | --- |
+| Landing | `/[lang]` | Figma landing frames 99–122: intro, loader, scroll scenes, side menu, live owner map, Contact form. |
 | Login / register | `/[lang]/login` | Email + 6-digit one-time code. One screen for login and registration. |
 | Claim | `/[lang]/claim` (the general QR code points to `/claim`) | Serial + hidden code, checked before login. |
 | My Bottles, passport | `/[lang]/my-bottles`, `/[lang]/my-bottles/[serial]` | Current owner only; the hidden code is never sent to the portal. |
@@ -14,12 +14,19 @@ The public landing site is out of scope for this repository.
 | Accept | `/[lang]/accept/[token]` | Single-use link, only for the invited email, no expiry. |
 | Profile | `/[lang]/profile` | Name, email change with code, email language; country read-only. |
 | Bottle Owners | `/[lang]/owners` | Public list of named current owners, search, newest first. |
-| Admin | `/admin` | Dashboard, series + code generation + CSV/QR, bottles, customers, owners, map pins, emails, language strings, 2FA. |
+| Admin | `/admin` | Dashboard, series + code generation + CSV/QR, bottles, customers, owners, map pins, Contact messages, emails, language strings, 2FA. |
 
 Languages: `hy`, `en`, `ru`. UI strings live in `messages/*.json`; admins can override any of them in
 Admin → Language strings. Armenian and Russian texts are working drafts until the client supplies final translations.
 
-The portal screens have no Figma design yet. They use the ONCE style from the landing design
+**Landing images** are placeholders cropped from screenshots until the Figma assets are exported. Replace the files in
+`public/landing/` with the real images under the same names (no code change): `hero.jpg` (bottle, frame 108),
+`about.jpg` (112), `craft.jpg` (120), `product.jpg` (121/122), `workshop.jpg` (109), `history.jpg` (113),
+`unveil.jpg` (114–116), `loader.jpg` (100–103). The world map is `public/landing/world.svg`
+(generated from Natural Earth country shapes; pins use the same projection in `src/lib/map-projection.ts`).
+The Instagram / Facebook links in the Contact section are placeholders.
+
+The portal screens follow the Figma portal design. They use the ONCE style from the landing design
 (black, copper `#b27649`, cream `#d3c3af`, Didot / Cormorant Garamond / Montserrat) and are responsive.
 
 ## Stack
