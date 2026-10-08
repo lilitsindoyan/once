@@ -1,85 +1,145 @@
 "use client";
 
-import Lenis from "lenis";
-import "lenis/dist/lenis.css";
 import { useEffect } from "react";
 
-let lenis: Lenis | null = null;
+/**
+ * "One screen at a time" scrolling for the landing (desktop), like the Figma prototype:
+ * each wheel gesture / arrow key moves exactly one screen, with an eased glide.
+ * Tall scroll scenes ([data-snap="scene"]) have two stops — start and end — and the glide between them
+ * plays the scene's animation. Phones and small windows keep normal scrolling.
+ */
 
-const ease = (t: number) => 1 - Math.pow(1 - t, 4);
+let paused = false;
+let goTo: ((target: number, ms?: number) => void) | null = null;
 
-/** Smooth scroll to a section (used by the side menu). Falls back to native scrolling. */
+export const pauseScroll = () => {
+  paused = true;
+};
+export const resumeScroll = () => {
+  paused = false;
+};
+
+/** Glide to a section (side menu, Back to home). */
 export function scrollToSection(el: HTMLElement) {
-  if (lenis) lenis.scrollTo(el, { duration: 1.6, easing: ease });
-  else el.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  const y = el.getBoundingClientRect().top + window.scrollY;
+  if (goTo) goTo(y);
+  else el.scrollIntoView({ behavior: reducedMotion() ? "auto" : "smooth" });
 }
 
-/** The loader holds the page still until it fades out. */
-export const pauseScroll = () => lenis?.stop();
-export const resumeScroll = () => lenis?.start();
+const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
-/**
- * Landing scroll feel:
- *  - inertia smoothing of wheel / trackpad scrolling (Lenis; touch keeps the phone's own scrolling)
- *  - on desktop, when scrolling stops near a section edge, it settles so the section fills the screen.
- *    Tall scroll scenes ([data-snap="scene"]) settle on their start or end, never in the middle of the animation.
- */
+/** Every resting position on the page, top to bottom. */
+function stops() {
+  const y0 = window.scrollY;
+  const vh = window.innerHeight;
+  const out: { y: number; scene: boolean }[] = [];
+  for (const el of document.querySelectorAll<HTMLElement>("[data-snap]")) {
+    const top = Math.round(el.getBoundingClientRect().top + y0);
+    const end = top + el.offsetHeight - vh;
+    out.push({ y: top, scene: false });
+    if (end > top + 40) out.push({ y: end, scene: el.dataset.snap === "scene" });
+  }
+  return out.sort((a, b) => a.y - b.y);
+}
+
 export function useSmoothScroll() {
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (reducedMotion()) return;
+    const enabled = () => window.innerWidth >= 1024 && window.innerHeight >= 560;
 
-    const l = new Lenis({ lerp: 0.075, wheelMultiplier: 0.9, smoothWheel: true });
-    lenis = l;
-    if (document.documentElement.style.overflow === "hidden") l.stop(); // loader still showing
-    let raf = requestAnimationFrame(function loop(time) {
-      l.raf(time);
-      raf = requestAnimationFrame(loop);
-    });
+    let anim = 0;
+    let animating = false;
+    let lastWheel = 0;
+    let needQuiet = false; // after a glide, wait for the trackpad's momentum to stop
 
-    let idle: ReturnType<typeof setTimeout>;
-    let snapping = false;
+    const glide = (target: number, ms?: number) => {
+      cancelAnimationFrame(anim);
+      const from = window.scrollY;
+      const dist = target - from;
+      if (Math.abs(dist) < 2) return;
+      const duration = ms ?? Math.min(1500, 650 + Math.abs(dist) * 0.35);
+      const start = performance.now();
+      animating = true;
+      const frame = (now: number) => {
+        const t = Math.min(1, (now - start) / duration);
+        window.scrollTo(0, from + dist * easeInOut(t));
+        if (t < 1) anim = requestAnimationFrame(frame);
+        else {
+          animating = false;
+          needQuiet = true;
+        }
+      };
+      anim = requestAnimationFrame(frame);
+    };
+    goTo = glide;
 
-    const settle = () => {
-      if (snapping || window.innerWidth < 1024 || window.innerHeight < 560) return;
+    const step = (dir: 1 | -1) => {
+      const list = stops();
       const y = window.scrollY;
-      const vh = window.innerHeight;
-      const points: number[] = [];
-      for (const el of document.querySelectorAll<HTMLElement>("[data-snap]")) {
-        const top = el.getBoundingClientRect().top + y;
-        const end = top + el.offsetHeight - vh;
-        if (el.dataset.snap === "scene") {
-          if (y > top + 40 && y < end - 40) return; // inside an animation: leave it where the user put it
-          points.push(top, end);
-        } else {
-          points.push(top);
-          if (end > top + 40) points.push(end);
-        }
-      }
-      let best = y;
-      let dist = Infinity;
-      for (const p of points) {
-        const d = Math.abs(p - y);
-        if (d < dist) {
-          dist = d;
-          best = p;
-        }
-      }
-      if (dist < 3 || dist > vh * 0.42) return;
-      snapping = true;
-      l.scrollTo(best, { duration: 0.9, easing: ease, onComplete: () => (snapping = false) });
-      setTimeout(() => (snapping = false), 1200);
+      const next = dir > 0 ? list.find((s) => s.y > y + 4) : [...list].reverse().find((s) => s.y < y - 4);
+      if (!next) return;
+      // Into or out of a scene: slower, so its animation reads.
+      const prev = list.find((s) => Math.abs(s.y - y) <= 4);
+      const scene = (dir > 0 && next.scene) || (dir < 0 && prev?.scene);
+      glide(next.y, scene ? 1700 : undefined);
     };
 
-    l.on("scroll", () => {
-      clearTimeout(idle);
-      idle = setTimeout(settle, 160);
-    });
+    const onWheel = (e: WheelEvent) => {
+      if (!enabled() || e.ctrlKey) return; // pinch-zoom stays native
+      const target = e.target as HTMLElement | null;
+      if (target?.closest("textarea, [data-native-scroll]")) return;
+      e.preventDefault();
+      const now = performance.now();
+      const quietGap = now - lastWheel > 180;
+      lastWheel = now;
+      if (paused || animating) return;
+      if (needQuiet && !quietGap) return;
+      needQuiet = false;
+      if (Math.abs(e.deltaY) < 6) return;
+      step(e.deltaY > 0 ? 1 : -1);
+    };
 
-    return () => {
-      cancelAnimationFrame(raf);
+    const onKey = (e: KeyboardEvent) => {
+      if (!enabled() || paused) return;
+      const t = e.target as HTMLElement | null;
+      if (t?.closest("input, textarea, select, [contenteditable]")) return;
+      const down = ["ArrowDown", "PageDown", " "].includes(e.key) && !e.shiftKey;
+      const up = ["ArrowUp", "PageUp"].includes(e.key) || (e.key === " " && e.shiftKey);
+      if (!down && !up && e.key !== "Home" && e.key !== "End") return;
+      e.preventDefault();
+      if (animating) return;
+      if (e.key === "Home") return glide(0);
+      if (e.key === "End") return glide(stops().at(-1)?.y ?? 0);
+      step(down ? 1 : -1);
+    };
+
+    // Scrollbar drags or resizes: settle on the nearest stop once the page is still.
+    let idle: ReturnType<typeof setTimeout>;
+    const settle = () => {
+      if (!enabled() || animating || paused) return;
+      const y = window.scrollY;
+      const nearest = stops().reduce((a, b) => (Math.abs(b.y - y) < Math.abs(a.y - y) ? b : a), { y, scene: false });
+      if (Math.abs(nearest.y - y) > 2) glide(nearest.y, 500);
+    };
+    const onScroll = () => {
+      if (animating) return;
       clearTimeout(idle);
-      l.destroy();
-      lenis = null;
+      idle = setTimeout(settle, 220);
+    };
+
+    window.addEventListener("wheel", onWheel, { passive: false });
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      cancelAnimationFrame(anim);
+      clearTimeout(idle);
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      goTo = null;
     };
   }, []);
 }
