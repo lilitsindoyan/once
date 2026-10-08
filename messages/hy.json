@@ -353,6 +353,13 @@
     "contactSending": "Ուղարկվում է…",
     "contactSent": "Շնորհակալություն։ Շուտով կկապվենք ձեզ հետ։",
     "contactSocial": "Սոցիալական ցանցեր",
-    "backHome": "Վերադառնալ սկիզբ"
+    "backHome": "Վերադառնալ սկիզբ",
+    "contactEyebrow": "07 — Կապ",
+    "contactNamePh": "Ձեր անունը",
+    "contactMessagePh": "Ինչո՞վ կարող ենք օգնել",
+    "contactErrName": "Խնդրում ենք նշել ձեր անունը։",
+    "contactErrEmail": "Խնդրում ենք նշել ճիշտ էլ. հասցե։",
+    "contactErrMessage": "Խնդրում ենք գրել կարճ հաղորդագրություն։",
+    "contactAgain": "Ուղարկել ևս մեկ հաղորդագրություն"
   }
 }

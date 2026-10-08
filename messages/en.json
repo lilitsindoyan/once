@@ -353,6 +353,13 @@
     "contactSending": "Sending…",
     "contactSent": "Thank you. We’ll be in touch soon.",
     "contactSocial": "Social links",
-    "backHome": "Back to home"
+    "backHome": "Back to home",
+    "contactEyebrow": "07 — Get in touch",
+    "contactNamePh": "Your name",
+    "contactMessagePh": "How can we help?",
+    "contactErrName": "Please enter your name.",
+    "contactErrEmail": "Please enter a valid email address.",
+    "contactErrMessage": "Please write a short message.",
+    "contactAgain": "Send another message"
   }
 }

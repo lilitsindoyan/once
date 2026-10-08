@@ -406,26 +406,41 @@ function MapSection({ pins, countryNames }: { pins: LandingPin[]; countryNames: 
 function Contact({ email }: { email?: string }) {
   const t = useTranslations("landing");
   const ref = useReveal<HTMLElement>(0.15);
+  const backHome = (e: React.MouseEvent) => {
+    const home = document.getElementById("home");
+    if (!home) return;
+    e.preventDefault();
+    scrollToSection(home);
+  };
   return (
-    <section ref={ref} id="contact" data-nav="contact" data-snap data-px className="landing-glow relative flex min-h-dvh flex-col py-28 lg:py-[clamp(96px,18vh,183px)]">
-      <div className={`px-text w-full flex-1 ${PAD}`}>
-        <div className="mx-auto max-w-[760px]">
-          <h2 className={`text-[44px] uppercase sm:text-[56px] ${TITLE}`}><Words text={t("contactTitle")} /></h2>
-          <p className="reveal mt-3 text-[16px] text-cream-2" style={{ ["--d" as string]: "120ms" }}>
+    <section
+      ref={ref}
+      id="contact"
+      data-nav="contact"
+      data-snap
+      data-px
+      className="landing-glow relative flex min-h-dvh flex-col pt-28 lg:h-dvh lg:min-h-[620px] lg:pt-[clamp(100px,15vh,150px)]"
+    >
+      <div className={`px-text grid w-full flex-1 content-center gap-12 pb-12 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-[clamp(48px,7vw,120px)] ${PAD}`}>
+        {/* Left: title, line, how to reach us */}
+        <div className="flex flex-col">
+          <p className="reveal text-[12px] tracking-[0.3em] text-copper uppercase">{t("contactEyebrow")}</p>
+          <h2 className={`mt-3 text-[44px] uppercase sm:text-[56px] lg:text-[clamp(44px,4.6vw,66px)] ${TITLE}`}>
+            <Words text={t("contactTitle")} delay={80} />
+          </h2>
+          <span className="draw-line mt-6 block h-px w-[min(220px,60vw)] bg-gradient-to-r from-copper to-transparent" style={{ ["--d" as string]: "300ms" }} />
+          <p className={`reveal mt-6 max-w-[380px] ${BODY}`} style={{ ["--d" as string]: "250ms" }}>
             {t("contactText")}
           </p>
-          <div className="reveal" style={{ ["--d" as string]: "240ms" }}>
-            <ContactForm />
-          </div>
-          <div className="reveal mt-[clamp(32px,6vh,56px)] flex flex-wrap items-end justify-between gap-6" style={{ ["--d" as string]: "360ms" }}>
+          <div className="reveal mt-[clamp(24px,5vh,48px)] space-y-4" style={{ ["--d" as string]: "400ms" }}>
+            {email && (
+              <a href={`mailto:${email}`} className="block font-display text-[20px] text-cream hover:text-white">
+                {email}
+              </a>
+            )}
             <div>
-              <p className="font-display text-[18px] text-cream">{t("contactSocial")}</p>
-              <div className="mt-3 flex gap-5 text-[13px] tracking-[0.12em] text-cream-2 uppercase">
-                {email && (
-                  <a href={`mailto:${email}`} className="hover:text-white">
-                    {email}
-                  </a>
-                )}
+              <p className="text-[11px] tracking-[0.24em] text-mute uppercase">{t("contactSocial")}</p>
+              <div className="mt-2 flex gap-6 text-[13px] tracking-[0.14em] text-cream-2 uppercase">
                 <a href="https://www.instagram.com/" target="_blank" rel="noreferrer" className="hover:text-white">
                   Instagram
                 </a>
@@ -434,23 +449,22 @@ function Contact({ email }: { email?: string }) {
                 </a>
               </div>
             </div>
-            <a
-              href="#home"
-              onClick={(e) => {
-                const home = document.getElementById("home");
-                if (!home) return;
-                e.preventDefault();
-                scrollToSection(home);
-              }}
-              className="inline-flex items-center gap-2 text-[13px] tracking-[0.16em] text-copper uppercase hover:text-white"
-            >
-              <ArrowUp className="size-4" strokeWidth={1.2} />
-              {t("backHome")}
-            </a>
           </div>
         </div>
+
+        {/* Right: the form */}
+        <div className="reveal lg:pt-[clamp(0px,4vh,40px)]" style={{ ["--d" as string]: "300ms" }}>
+          <ContactForm />
+        </div>
       </div>
-      <p className={`mt-16 text-[11px] tracking-[0.2em] text-mute uppercase ${PAD}`}>© {new Date().getFullYear()} ONCE</p>
+
+      <footer className={`flex items-center justify-between gap-6 border-t border-white/10 py-5 text-[11px] tracking-[0.2em] text-mute uppercase ${PAD}`}>
+        <span>© {new Date().getFullYear()} ONCE</span>
+        <a href="#home" onClick={backHome} className="inline-flex items-center gap-2 text-copper hover:text-white">
+          <ArrowUp className="size-4" strokeWidth={1.2} />
+          {t("backHome")}
+        </a>
+      </footer>
     </section>
   );
 }

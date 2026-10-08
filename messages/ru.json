@@ -353,6 +353,13 @@
     "contactSending": "Отправка…",
     "contactSent": "Спасибо. Мы скоро свяжемся с вами.",
     "contactSocial": "Соцсети",
-    "backHome": "Наверх"
+    "backHome": "Наверх",
+    "contactEyebrow": "07 — Связь",
+    "contactNamePh": "Ваше имя",
+    "contactMessagePh": "Чем мы можем помочь?",
+    "contactErrName": "Пожалуйста, укажите имя.",
+    "contactErrEmail": "Пожалуйста, укажите корректный email.",
+    "contactErrMessage": "Пожалуйста, напишите короткое сообщение.",
+    "contactAgain": "Отправить ещё одно сообщение"
   }
 }
