@@ -58,7 +58,7 @@ export function useSmoothScroll() {
       const from = window.scrollY;
       const dist = target - from;
       if (Math.abs(dist) < 2) return;
-      const duration = ms ?? Math.min(1500, 650 + Math.abs(dist) * 0.35);
+      const duration = ms ?? Math.min(2400, 1150 + Math.abs(dist) * 0.45);
       const start = performance.now();
       animating = true;
       const frame = (now: number) => {
@@ -82,7 +82,7 @@ export function useSmoothScroll() {
       // Into or out of a scene: slower, so its animation reads.
       const prev = list.find((s) => Math.abs(s.y - y) <= 4);
       const scene = (dir > 0 && next.scene) || (dir < 0 && prev?.scene);
-      glide(next.y, scene ? 1700 : undefined);
+      glide(next.y, scene ? 2600 : undefined);
     };
 
     const onWheel = (e: WheelEvent) => {
@@ -120,7 +120,7 @@ export function useSmoothScroll() {
       if (!enabled() || animating || paused) return;
       const y = window.scrollY;
       const nearest = stops().reduce((a, b) => (Math.abs(b.y - y) < Math.abs(a.y - y) ? b : a), { y, scene: false });
-      if (Math.abs(nearest.y - y) > 2) glide(nearest.y, 500);
+      if (Math.abs(nearest.y - y) > 2) glide(nearest.y, 800);
     };
     const onScroll = () => {
       if (animating) return;

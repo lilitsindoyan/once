@@ -75,17 +75,17 @@ body {
   opacity: 0;
   transform: translateY(28px);
   transition:
-    opacity 1s cubic-bezier(0.2, 0.7, 0.2, 1),
-    transform 1.1s cubic-bezier(0.2, 0.7, 0.2, 1);
-  transition-delay: var(--d, 0ms);
+    opacity 1.7s cubic-bezier(0.2, 0.7, 0.2, 1),
+    transform 1.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition-delay: calc(var(--d, 0ms) * 1.6);
 }
 .reveal-img {
   opacity: 0;
   transform: scale(1.08);
   transition:
-    opacity 1.4s ease,
-    transform 2.2s cubic-bezier(0.2, 0.7, 0.2, 1);
-  transition-delay: var(--d, 0ms);
+    opacity 2.2s ease,
+    transform 3.4s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition-delay: calc(var(--d, 0ms) * 1.6);
 }
 [data-in] .reveal,
 [data-in].reveal,
@@ -123,8 +123,8 @@ html:has([data-loader]) {
 .words .w > span {
   display: inline-block;
   transform: translateY(105%);
-  transition: transform 1.1s cubic-bezier(0.2, 0.75, 0.15, 1);
-  transition-delay: calc(var(--d, 0ms) + var(--i) * 70ms);
+  transition: transform 1.8s cubic-bezier(0.2, 0.75, 0.15, 1);
+  transition-delay: calc(var(--d, 0ms) * 1.6 + 250ms + var(--i) * 120ms);
 }
 [data-in] .words .w > span {
   transform: none;
@@ -134,7 +134,7 @@ html:has([data-loader]) {
 .draw-line {
   transform: scaleX(0);
   transform-origin: left center;
-  transition: transform 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) var(--d, 0ms);
+  transition: transform 2.6s cubic-bezier(0.2, 0.7, 0.2, 1) calc(var(--d, 0ms) * 1.6);
 }
 [data-in] .draw-line {
   transform: none;
@@ -144,7 +144,7 @@ html:has([data-loader]) {
 .draw-svg :is(path, circle, rect) {
   stroke-dasharray: 260;
   stroke-dashoffset: 260;
-  transition: stroke-dashoffset 2.2s cubic-bezier(0.4, 0.1, 0.2, 1) var(--d, 0ms);
+  transition: stroke-dashoffset 3.4s cubic-bezier(0.4, 0.1, 0.2, 1) calc(var(--d, 0ms) * 1.6 + 300ms);
 }
 [data-in] .draw-svg :is(path, circle, rect) {
   stroke-dashoffset: 0;
@@ -153,7 +153,7 @@ html:has([data-loader]) {
 /* Bullets pop in. */
 .reveal-dot {
   transform: scale(0);
-  transition: transform 0.8s cubic-bezier(0.3, 1.6, 0.4, 1) var(--d, 0ms);
+  transition: transform 1.2s cubic-bezier(0.3, 1.5, 0.4, 1) calc(var(--d, 0ms) * 1.6);
 }
 [data-in] .reveal-dot {
   transform: none;
@@ -181,8 +181,8 @@ html:has([data-loader]) {
   }
 }
 .menu-in {
-  animation: menu-in 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
-  animation-delay: var(--d, 0ms);
+  animation: menu-in 1.1s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation-delay: calc(var(--d, 0ms) * 1.5);
 }
 
 @keyframes float {
@@ -195,7 +195,7 @@ html:has([data-loader]) {
   }
 }
 .float {
-  animation: float 7s ease-in-out infinite;
+  animation: float 9s ease-in-out infinite;
 }
 
 @keyframes pin-pulse {

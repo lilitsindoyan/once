@@ -116,10 +116,10 @@ export function LandingChrome({
         <ol ref={railRef} className="relative flex flex-col gap-[clamp(22px,4.6vh,46px)] border-l border-white/40 py-1 pl-[19px]">
           {SECTIONS.map((id, i) => item(id, i))}
           {/* Copper progress along the rail and the marker that glides to the current section */}
-          <span aria-hidden className="absolute top-0 -left-px w-px bg-copper transition-[height] duration-700 ease-out" style={{ height: dotTop + 6 }} />
+          <span aria-hidden className="absolute top-0 -left-px w-px bg-copper transition-[height] duration-[1400ms] ease-out" style={{ height: dotTop + 6 }} />
           <span
             aria-hidden
-            className="absolute -left-[6px] size-[11px] rounded-full border border-white bg-black transition-[top] duration-700 ease-[cubic-bezier(0.6,0,0.2,1)]"
+            className="absolute -left-[6px] size-[11px] rounded-full border border-white bg-black transition-[top] duration-[1400ms] ease-[cubic-bezier(0.6,0,0.2,1)]"
             style={{ top: dotTop }}
           />
         </ol>
