@@ -10,6 +10,7 @@ import { LandingChrome, SECTIONS } from "./chrome";
 import { ContactForm } from "./contact-form";
 import { useActiveSection, useReveal, useSceneProgress } from "./hooks";
 import { Loader } from "./loader";
+import { scrollToSection, useSmoothScroll } from "./smooth-scroll";
 import { WorldMap } from "./world-map";
 
 /** Left edge of content on desktop, clear of the side menu. */
@@ -34,6 +35,7 @@ export function Landing({
   loggedIn: boolean;
   contactEmail?: string;
 }) {
+  useSmoothScroll();
   const active = useActiveSection(SECTIONS);
   const [chrome, setChrome] = useState(false);
   const onHero = useCallback((p: number) => setChrome((c) => (p > 0.55 ? true : p < 0.45 ? false : c)), []);
@@ -67,7 +69,7 @@ function Hero({ onProgress }: { onProgress: (p: number) => void }) {
   const t = useTranslations("landing");
   const ref = useSceneProgress<HTMLElement>(onProgress);
   return (
-    <section ref={ref} id="home" data-nav="home" className="scene relative h-[230vh] lg:h-[260vh]">
+    <section ref={ref} id="home" data-nav="home" data-snap="scene" className="scene relative h-[230vh] lg:h-[260vh]">
       <div className="sticky top-0 flex h-dvh items-center justify-center overflow-hidden">
         {/* Bottle, revealed through a widening circle */}
         <div
@@ -121,7 +123,7 @@ function BornOfTradition() {
   const t = useTranslations("landing");
   const ref = useReveal<HTMLElement>();
   return (
-    <section ref={ref} className="relative flex min-h-dvh items-center overflow-hidden py-28">
+    <section ref={ref} data-snap className="relative flex min-h-dvh items-center overflow-hidden py-28">
       <div className="reveal-img absolute inset-y-0 right-0 w-full lg:w-[62%]">
         <Image src="/landing/about.jpg" alt="" fill sizes="(min-width:1024px) 62vw, 100vw" className="object-cover opacity-70" />
         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-black/10" />
@@ -142,7 +144,7 @@ function CraftOfOnce() {
   const t = useTranslations("landing");
   const ref = useReveal<HTMLElement>();
   return (
-    <section ref={ref} className="relative min-h-dvh overflow-hidden">
+    <section ref={ref} data-snap className="relative min-h-dvh overflow-hidden">
       <div className="reveal-img absolute inset-0 lg:left-[37%]">
         <Image src="/landing/craft.jpg" alt="" fill sizes="(min-width:1024px) 63vw, 100vw" className="object-cover object-left opacity-80" />
         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/20 to-black/50" />
@@ -167,7 +169,7 @@ function FourDecades() {
   const t = useTranslations("landing");
   const ref = useReveal<HTMLElement>(0.3);
   return (
-    <section ref={ref} className="relative flex min-h-dvh flex-col items-center overflow-hidden pt-28 lg:pt-[clamp(110px,15vh,140px)]">
+    <section ref={ref} data-snap className="relative flex min-h-dvh flex-col items-center overflow-hidden pt-28 lg:pt-[clamp(110px,15vh,140px)]">
       <p className="reveal max-w-[492px] px-6 text-center font-display text-[22px] leading-[1.4] text-cream sm:text-[26px]">{t("decadesText")}</p>
       <span className="reveal mt-5 h-px w-[266px] bg-gradient-to-r from-transparent via-copper to-transparent" style={{ ["--d" as string]: "200ms" }} />
       <div className="reveal-img relative mt-6 w-full flex-1" style={{ ["--d" as string]: "250ms" }}>
@@ -182,7 +184,7 @@ function Essence() {
   const ref = useReveal<HTMLElement>();
   const lines = ["essence1", "essence2", "essence3", "essence4"] as const;
   return (
-    <section ref={ref} className="landing-glow relative flex min-h-dvh items-center py-28">
+    <section ref={ref} data-snap className="landing-glow relative flex min-h-dvh items-center py-28">
       <div className={`w-full ${PAD}`}>
         <h2 className={`reveal max-w-[560px] text-[44px] sm:text-[60px] lg:text-[clamp(52px,6vw,86px)] ${TITLE}`}>{t("essenceTitle")}</h2>
         <ul className="mt-[clamp(40px,9vh,80px)] space-y-[clamp(14px,2.6vh,24px)]">
@@ -202,7 +204,7 @@ function Workshop() {
   const t = useTranslations("landing");
   const ref = useReveal<HTMLElement>();
   return (
-    <section ref={ref} className="relative flex min-h-dvh items-end overflow-hidden py-24 lg:py-[clamp(80px,14vh,128px)]">
+    <section ref={ref} data-snap className="relative flex min-h-dvh items-center overflow-hidden py-24">
       <div className="reveal-img absolute inset-0 lg:left-[6%]">
         <Image src="/landing/workshop.jpg" alt="" fill sizes="94vw" className="object-cover object-right opacity-70" />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-black/40" />
@@ -224,7 +226,7 @@ function History() {
   const t = useTranslations("landing");
   const ref = useReveal<HTMLElement>();
   return (
-    <section ref={ref} id="history" data-nav="history" className="relative flex min-h-dvh flex-col overflow-hidden py-28 lg:py-[clamp(96px,17vh,160px)]">
+    <section ref={ref} id="history" data-nav="history" data-snap className="relative flex min-h-dvh flex-col justify-center overflow-hidden py-28">
       <div className="reveal-img absolute inset-0">
         <Image src="/landing/history.jpg" alt="" fill sizes="100vw" className="object-cover opacity-45" />
         <div className="absolute inset-0 bg-gradient-to-b from-black via-black/50 to-black" />
@@ -250,7 +252,7 @@ function Product() {
   const t = useTranslations("landing");
   const ref = useSceneProgress<HTMLElement>();
   return (
-    <section ref={ref} id="product" data-nav="product" className="scene relative h-[200vh] lg:h-[240vh]">
+    <section ref={ref} id="product" data-nav="product" data-snap="scene" className="scene relative h-[200vh] lg:h-[240vh]">
       <div className="sticky top-0 h-dvh overflow-hidden">
         <div
           className="absolute inset-0"
@@ -319,7 +321,7 @@ function Ownership() {
   const t = useTranslations("landing");
   const ref = useReveal<HTMLElement>(0.15);
   return (
-    <section ref={ref} id="ownership" data-nav="ownership" className="once-texture relative flex min-h-dvh items-center py-28">
+    <section ref={ref} id="ownership" data-nav="ownership" data-snap className="once-texture relative flex min-h-dvh items-center py-28">
       <div className={`w-full ${PAD}`}>
         <p className="reveal text-[15px] tracking-[0.08em] text-copper uppercase sm:text-[17px]">{t("ownEyebrow")}</p>
         <h2 className={`reveal mt-1 text-[40px] sm:text-[52px] lg:text-[clamp(40px,4.2vw,60px)] ${TITLE}`} style={{ ["--d" as string]: "100ms" }}>
@@ -351,7 +353,7 @@ function MapSection({ pins, countryNames }: { pins: LandingPin[]; countryNames: 
   const t = useTranslations("landing");
   const ref = useReveal<HTMLElement>(0.15);
   return (
-    <section ref={ref} id="map" data-nav="map" className="relative flex min-h-dvh flex-col justify-center overflow-hidden bg-black py-24 lg:py-16">
+    <section ref={ref} id="map" data-nav="map" data-snap className="relative flex min-h-dvh flex-col justify-center overflow-hidden bg-black py-24 lg:py-16">
       <div className="pointer-events-none absolute -bottom-40 -left-40 size-[620px] rounded-full bg-[radial-gradient(circle,rgba(150,66,22,0.35),transparent_65%)]" />
       <div className="relative mx-auto w-full max-w-[1300px] lg:pr-12 lg:pl-[clamp(150px,11vw,200px)]">
         <div className="reveal-img lg:ml-auto lg:w-[min(100%,calc(84dvh*1.497))]">
@@ -382,7 +384,7 @@ function Contact({ email }: { email?: string }) {
   const t = useTranslations("landing");
   const ref = useReveal<HTMLElement>(0.15);
   return (
-    <section ref={ref} id="contact" data-nav="contact" className="landing-glow relative flex min-h-dvh flex-col py-28 lg:py-[clamp(96px,18vh,183px)]">
+    <section ref={ref} id="contact" data-nav="contact" data-snap className="landing-glow relative flex min-h-dvh flex-col py-28 lg:py-[clamp(96px,18vh,183px)]">
       <div className={`w-full flex-1 ${PAD}`}>
         <div className="mx-auto max-w-[760px]">
           <h2 className={`reveal text-[44px] uppercase sm:text-[56px] ${TITLE}`}>{t("contactTitle")}</h2>
@@ -409,7 +411,16 @@ function Contact({ email }: { email?: string }) {
                 </a>
               </div>
             </div>
-            <a href="#home" className="inline-flex items-center gap-2 text-[13px] tracking-[0.16em] text-copper uppercase hover:text-white">
+            <a
+              href="#home"
+              onClick={(e) => {
+                const home = document.getElementById("home");
+                if (!home) return;
+                e.preventDefault();
+                scrollToSection(home);
+              }}
+              className="inline-flex items-center gap-2 text-[13px] tracking-[0.16em] text-copper uppercase hover:text-white"
+            >
               <ArrowUp className="size-4" strokeWidth={1.2} />
               {t("backHome")}
             </a>

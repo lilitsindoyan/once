@@ -3,6 +3,7 @@
 import clsx from "clsx";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
+import { pauseScroll, resumeScroll } from "./smooth-scroll";
 
 const KEY = "once-loader-seen";
 const DURATION = 1900;
@@ -24,6 +25,7 @@ export function Loader() {
       return;
     }
     document.documentElement.style.overflow = "hidden";
+    pauseScroll();
     const start = performance.now();
     let raf = 0;
     let timer: ReturnType<typeof setTimeout>;
@@ -37,6 +39,7 @@ export function Loader() {
         } catch {}
         setPhase("fading");
         document.documentElement.style.overflow = "";
+        resumeScroll();
         timer = setTimeout(() => setPhase("off"), 900);
       }
     };
@@ -45,6 +48,7 @@ export function Loader() {
       cancelAnimationFrame(raf);
       clearTimeout(timer);
       document.documentElement.style.overflow = "";
+      resumeScroll();
     };
   }, []);
 
@@ -61,7 +65,7 @@ export function Loader() {
       style={{ backgroundImage: "url(/landing/loader.jpg)" }}
     >
       <noscript>
-        <style>{`[data-loader]{display:none}`}</style>
+        <style>{`[data-loader]{display:none}html{overflow:auto!important}`}</style>
       </noscript>
       <div className="flex flex-col items-center px-6 text-center">
         <p className="text-[11px] tracking-[0.42em] text-cream uppercase sm:text-[13px]">{t("loaderEyebrow")}</p>

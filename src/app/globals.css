@@ -95,6 +95,11 @@ body {
   transform: none;
 }
 
+/* Hold the page still under the loader, even before the page's script has started. */
+html:has([data-loader]) {
+  overflow: hidden;
+}
+
 /* Scroll scenes: --p (0…1) is set on the scene by useSceneProgress. */
 .scene {
   --p: 0;

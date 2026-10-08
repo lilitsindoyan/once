@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { scrollToSection } from "./smooth-scroll";
 
 export const SECTIONS = ["home", "about", "history", "product", "ownership", "map", "contact"] as const;
 export type SectionId = (typeof SECTIONS)[number];
@@ -47,7 +48,7 @@ export function LandingChrome({
     const el = document.getElementById(id);
     if (!el) return;
     e.preventDefault();
-    el.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    scrollToSection(el);
     history.replaceState(null, "", `#${id}`);
   };
 
