@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function AdminRootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={fontVariables}>
-      <body className="admin">{children}</body>
+      <body className="admin" suppressHydrationWarning>{children}</body>
     </html>
   );
 }
